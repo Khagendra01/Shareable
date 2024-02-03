@@ -1,0 +1,77 @@
+﻿try {
+    var localstorageTesting = localStorage && localStorage["TRY_SOMETHING"];
+} catch (e) {
+    delete window.localStorage;
+    window.localStorage = null;
+}
+
+var tdxClientLoader = (function () {
+    return {
+        _loadResource: function (type, url, callback, errorCallback) {
+            var resource;
+            if (type === 'script') {
+                resource = document.createElement('script');
+                resource.type = 'text/javascript';
+                resource.src = url;
+            } else if (type === 'style') {
+                resource = document.createElement('link');
+                resource.rel = 'stylesheet';
+                resource.href = url;
+            } else {
+                if (errorCallback) errorCallback();
+                return;
+            }
+
+            if (callback) {
+                // then bind the event to the callback function
+                // there are several events for cross browser compatibility
+                resource.onreadystatechange = callback;
+                resource.onload = callback;
+            }
+
+            if (errorCallback) {
+                resource.onerror = errorCallback;
+            }
+
+            var head = document.getElementsByTagName('head')[0];
+
+            if (type === 'style') {
+                // If it's a style, try to insert it before the first style tag in the head to avoid breaking style inheritance.
+                var styles = head.getElementsByTagName('style');
+                if (styles.length) {
+                    head.insertBefore(resource, styles[0]);
+                    return;
+                }
+            }
+            
+            head.appendChild(resource);
+        },
+        getUrl: function (base) {
+            if (localStorage && localStorage["acs-override-tdxclient"]) {
+                return localStorage["acs-override-tdxclient"];
+            }
+            return base;
+        },
+        load: function (versionedUrl, cacheBuster, cssFiles, script, scriptCallback) {
+            var url = this.getUrl(versionedUrl);
+            var this$ = this;
+
+            if (window.dojoConfig) {
+                window.dojoConfig.baseUrl = url + window.dojoConfig.baseUrl;
+                window.dojoConfig.versionedUrl = url;
+                window.dojoConfig.cacheBust = cacheBuster;
+            }
+            if (window.tinyMCEPreInit) {
+                window.tinyMCEPreInit.base = url + window.tinyMCEPreInit.base;
+            }
+
+            (cssFiles || []).forEach(function(cssFile) {
+                this$._loadResource("style", url + cssFile + "?" + cacheBuster);
+            });
+            if (script) {
+                this._loadResource("script", url + script + "?" + cacheBuster, scriptCallback);
+            }
+        }
+    }
+})();
+

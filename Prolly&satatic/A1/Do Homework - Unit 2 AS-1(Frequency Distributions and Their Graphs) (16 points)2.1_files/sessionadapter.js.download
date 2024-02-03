@@ -1,0 +1,235 @@
+﻿(function (global) {
+
+    var eventTypes = {
+        IESSessionSignOut: "com.pearson.ies.ui.events.SessionSignOut",
+        IESSessionTokenGet: "com.pearson.ies.get.events.SessionToken",
+        IESSessionTokenAck: "com.pearson.ies.ack.events.SessionToken",
+    };
+
+    var tokenTypes = {
+        IES: "IES"
+    }
+
+    var sessionadapter = function (options) {
+        return new sessionadapter.init(options);
+    }
+
+    sessionadapter.init = function (options) {
+        var self = this;
+        self.target = options.target || undefined;
+        self.piSession = options.piSession;
+        self.piSessionLogoutCallbackUrl = options.piSessionLogoutCallbackUrl;
+        self.origin = window;
+        self.EventTypes = eventTypes;
+
+        window.addEventListener('message', this.receiveMessage.bind(this), false);
+    }
+
+    sessionadapter.prototype = {
+        getTarget: function () {
+            return this.target;
+        },
+        receiveMessage: function (event) { // handle received postMessages
+            if (!event || !event.eventType) {
+                return;
+            }
+            try {
+                if (event.eventType === this.EventTypes.IESSessionSignOut) { // Session Sign out
+                    var currentUrl = window.location.hostname;
+                    var DOMAIN_PARSE_REGEX = /^http(s)?:\/\/mylabmastering(-.*)?\.pearson\.com$/;
+                    var ovDomain = currentUrl.match(DOMAIN_PARSE_REGEX);
+
+                    if (ovDomain) {
+                        console.log("*****OV: signout********");
+                        /* Call user Signout */
+                        /*_________________  */
+                        /*______OR_________  */
+                        //var message = this.buildMessage(this.EventTypes.IESSessionSignOut);
+                        //this.sendMessageToTarget(this, message);
+                    } else {
+                        console.log("*****sends a postmessage: signout********");
+                        var message = this.buildMessage(this.EventTypes.IESSessionSignOut);
+                        this.sendMessageToTarget(this, message);
+                    }
+                } else if (event.eventType === this.EventTypes.IESSessionTokenGet) { // send IES session token
+                    console.log("*****sends a postmessage: ack token********");
+                    this.piSession.getToken(function (status, token) {
+                        var message = buildMessage(this.EventTypes.IESSessionTokenAck, token);
+                        this.sendMessageToTarget(this, message);
+                    });
+                } else if (event.eventType === this.EventTypes.IESSessionTokenAck) { // receive IES session token
+                    console.log("*****receive a postmessage: token********" + JSON.stringify(event));
+                }
+            } catch (ex) {
+                console.log('Error on processing postmessage: ' + ex);
+            }
+        },
+        sendMessage: function (eventType, token) {
+            if (this.target !== this.origin) {
+                sendMessageToTarget(this, buildMessage(eventType, token));
+            }
+            else {
+                this.piSession.logout(this.piSessionLogoutCallbackUrl);
+            }
+        },
+        setTarget: function (target) {
+            this.target = target;
+            return this;
+        }
+    };
+
+    // send postMessage to the target
+    var sendMessageToTarget = function (self, message) {
+        console.log('send message: ' + JSON.stringify(message));
+        self.target.postMessage(message, "*");
+    }
+
+    // build the message
+    var buildMessage = function (eventType, token) {
+
+        var message = {
+            eventType: eventType,
+            tokenType: tokenTypes.IES,
+            token: token
+        }
+
+        return message;
+    }
+
+    sessionadapter.init.prototype = sessionadapter.prototype;
+
+    global.sessionadapter = global.$COMessenger = sessionadapter;
+}(window));
+
+(function (global) {
+
+    var SessionJSHelper = function (options) {
+        return new SessionJSHelper.init(options);
+    }
+
+    SessionJSHelper.init = function (options) {
+        let self = this;
+        self.piSession = options.piSession;
+        self.piLoginSuccessUrl = options.piLoginSuccessUrl;
+        self.clientid = options.clientid;
+        self.isIesSso = options.isIesSso;
+        self.piLoginCallback = options.piLoginCallback;
+        self.isIesSessionRequired = options.isIesSessionRequired;
+        self.shouldDelayRetryForSafari = options.shouldDelayRetryForSafari;
+        self.shouldOpenBridgeInPopup = options.shouldOpenBridgeInPopup;
+        self.piBridgeUrl = options.piBridgeUrl;
+        self.piBridgePopupUrl = options.piBridgePopupUrl;
+        self.logoutUrl = options.logoutUrl;
+        self.sendMessageonIESSignOut = options.sendMessageonIESSignOut;
+        self.sessionIdleTimeoutVal = options.sessionIdleTimeoutVal;
+        self.logoutCallbackUrl = options.logoutCallbackUrl;
+        self.popupWindows = [];
+
+        var sessionjsv2input = document.createElement('input');
+        sessionjsv2input.setAttribute('type', 'hidden');
+        sessionjsv2input.setAttribute('id', 'pi_user_id');
+
+        var initOptions = {
+            "loginSuccessUrl": piLoginSuccessUrl
+        };
+
+        if (this.sessionIdleTimeoutVal != "") {
+            initOptions["sessionIdleTimeoutSeconds"] = sessionIdleTimeoutVal
+        };
+        
+        self.piSession.initialize(clientid, initOptions);
+        self.piSession.on(piSession.SessionStateKnownEvent, function (eventData) {
+            self.handleSessionKnownEvent(eventData, piSession);
+        }); 
+
+        self.piSession.on(piSession.LogoutEvent, function (eventData) {
+            self.logoutCallback();
+        }); 
+    }
+
+    // session state management 
+    SessionJSHelper.prototype = {
+        handleSessionKnownEvent: function (eventData, piSession, attempt = 0) {
+            let sessionState = this.piSession.hasValidSession(0);
+            console.log(attempt + ' ' + sessionState);
+            
+            if (sessionState === this.piSession.Success && this.isIesSessionRequired) {
+                this.piSession.getToken(function (status) { if (typeof this.piLoginCallback === 'function') { this.piLoginCallback(status); } }, 60, 60);
+            }
+            else if (sessionState === this.piSession.NoSession) { // SMS to Pi Bridge
+
+                if (this.shouldDelayRetryForSafari && attempt < 30) {
+                    setTimeout(() => {
+                        handleSessionKnownEvent(eventData, this.piSession, attempt + 1);
+                    }, 100);
+                    return;
+                }
+                if (this.shouldOpenBridgeInPopup && isXFrame()) {
+                    console.log('establishing bridge via popup');
+                    var bridgePopupWin = window.open(this.piBridgePopupUrl); // If there is no session, let's establish sms to pi bridge
+                    this.popupWindows['bridgePopup'] = bridgePopupWin;
+                }
+                else {
+                    console.log('establishing bridge');
+                    window.location = this.piBridgeUrl; // If there is no session, let's establish sms to pi bridge
+                }
+            }
+        },
+        logout: function () {
+            if (this.piSession) {
+                let sessionState = this.piSession.hasValidSession(0);
+                if (sessionState === this.piSession.Success) {
+                    this.piSession.logout();
+                }
+            }
+        },
+        logoutCallback() {
+            window.location = window.location.origin + this.logoutCallbackUrl;
+        }
+    };
+
+    SessionJSHelper.init.prototype = SessionJSHelper.prototype;
+
+    global.SessionJSHelper = global.$SJSHelper = SessionJSHelper;
+}(window));
+
+(function (global) {
+
+    var PopupHandler = function (options) {
+        return new PopupHandler.init(options);
+    }
+
+    // handle session keep alive for 3PGs 
+    function _notifyOpener() {
+        const _notifyOpenerId = setInterval(function () {
+            if (this.popupWindows && Object.keys(this.popupWindows).length > 0) {
+                for (let x in this.popupWindows) {
+                    if (popupWindows[x] && popupWindows[x].closed === false) {
+                        console.log('execute extendUserSession: ' + new Date().toString());
+                        this.piSession.extendUserSession();
+                        return;
+                    }
+                }
+            } else {
+                clearInterval(_notifyOpenerId);
+                return;
+            }
+        }, 1500000); // 25 minutes
+    }
+
+    PopupHandler.init = function (options) {
+        let self = this;
+        self.piSession = options.piSession;
+        self.popupWindow = options.popupWindow;
+    }
+
+    PopupHandler.prototype = {
+        notifyOpener: function () {
+            _notifyOpener();
+        }
+    }
+
+    PopupHandler.init.prototype = PopupHandler.prototype;
+
+    global.PopupHandler = global.$SJSHelper = PopupHandler;
+}(window));

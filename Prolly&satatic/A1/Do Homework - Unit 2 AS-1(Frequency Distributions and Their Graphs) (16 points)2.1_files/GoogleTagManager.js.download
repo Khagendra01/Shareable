@@ -1,0 +1,143 @@
+﻿(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl +
+            '&gtm_auth=' + gtmauth + '&gtm_preview=' + gtmpreview + '&gtm_cookies_win=x';
+    f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', gtmaccount);
+
+window.dataLayer = window.dataLayer || [];
+
+window.dataLayer.push({
+    'environment': environment,
+    'userId': myNavParams.userId,
+    'productId': myNavParams.productId,
+    'courseId': myNavParams.courseId,
+    'bookId': myNavParams.bookId,
+    'userRole': myNavParams.userRole,
+    'institutionKeyId': myNavParams.institutionKeyId,
+    'school': myNavParams.school,
+    'bookCode': myNavParams.bookCode,
+    'authSystemId': myNavParams.authSystemId,
+    'authsystemtypeId': myNavParams.authsystemtypeId,
+    'authSystemPartnerId': myNavParams.authSystemPartnerId,
+    'userOrigin': myNavParams.userOrigin,
+    'disciplineID': myNavParams.disciplineID
+});
+
+var isEnabled = myNavParams.IsTelemetryEnabled.toLowerCase();
+
+if (isEnabled === "true") {
+    window.dataLayer.push({
+        appId: "xl",
+        sessionId: myNavParams.SessionID,
+        userTimezoneOffsetNum: UserTimeZoneOffsetNum(),
+        webBrowser: UserBrowser(),
+        userIpV4: myNavParams.IPv4,
+        userIpV6: myNavParams.IPv6,
+        deviceType: UserDevice(),
+        originatingSytemCode: "xl",
+        operatingSystemCode: UserOSName(),
+        appVersion: ""
+    });
+
+    window.dataLayer.push({
+        event: "usertelemetry",
+        productPlatformCode: myNavParams.ProductPlatformCode,
+        productModelName: myNavParams.ProductName,
+        contentId: "",
+        contentIdType: "",
+        courseSectionId: "",
+        messageId: Uuid(),
+        transactionDt: new Date().toISOString(),
+        transactionLocalDt: UserLocalTimeStamp(),
+        errors: [
+            {
+                errorCode: "",
+                errorUrl: "",
+                errorMessage: "",
+                errorStateCode: "",
+                errorDetail: ""
+            }
+        ]
+    });
+}
+
+
+function getPageName() {
+    var url = location.href.split('/').pop();
+    return url.split('.')[0];
+}
+
+function UserOSName() {
+    var osName = "Unknown OS";
+    if (navigator.appVersion.indexOf("Win") != -1) osName = "Windows";
+    if (navigator.appVersion.indexOf("Mac") != -1) osName = "MacOS";
+    if (navigator.appVersion.indexOf("X11") != -1) osName = "UNIX";
+    if (navigator.appVersion.indexOf("Linux") != -1) osName = "Linux";
+
+    return osName;
+}
+
+function UserLocalTimeStamp() {
+    var d = new Date();
+    return d.getFullYear() +
+        '-' +
+        (d.getMonth() + 1) +
+        '-' +
+        d.getDate() +
+        'T' +
+        d.getHours() +
+        ':' +
+        d.getMinutes() +
+        ':' +
+        d.getMilliseconds();
+};
+
+function UserTimeZoneOffsetNum() {
+    var offset = new Date().getTimezoneOffset();
+    return offset / 60 * -1;
+};
+
+function Uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+function UserBrowser() {
+    var test = function (regexp) {
+        return regexp.test(window.navigator.userAgent);
+    }
+    switch (true) {
+        case test(/edg/i):
+            return "Microsoft Edge";
+        case test(/opr/i) && (!!window.opr || !!window.opera):
+            return "Opera";
+        case test(/chrome/i) && !!window.chrome:
+            return "Google Chrome";
+        case test(/trident/i):
+            return "Microsoft Internet Explorer";
+        case test(/firefox/i):
+            return "Firefox";
+        case test(/safari/i):
+            return "Safari";
+        default:
+            return "unknown";
+    }
+};
+
+function UserDevice() {
+    if (navigator.userAgent.match(/mobile/i)) {
+        return 'Mobile';
+    } else if (navigator.userAgent.match(/iPad|Android|Touch/i)) {
+        return 'Tablet';
+    } else {
+        return 'Desktop';
+    }
+};

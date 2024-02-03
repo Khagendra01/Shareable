@@ -1,0 +1,151 @@
+﻿/*
+This CSS resource incorporates links to font software which is the valuable copyrighted
+property of Monotype Imaging and/or its suppliers. You may not attempt to copy, install,
+redistribute, convert, modify or reverse engineer this font software. Please contact Monotype
+Imaging with any questions regarding Web Fonts:  http://www.fonts.com
+*/
+
+@font-face {
+    font-family: "TT Commons";
+    src: url("./Fonts/ttc-regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "TT Commons";
+    src: url("./Fonts/ttc-medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Hind";
+    src: url('./Fonts/hind-regular.ttf') format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Hind";
+    src: url('./Fonts/hind-semibold.ttf') format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Hind";
+    src: url('./Fonts/hind-medium.ttf') format("truetype");
+    font-weight: 500;
+    font-style: normal;
+}
+
+.xlbootstrap3 #mainTopNavContainer {
+    background-color: #000;
+    text-align: center;
+    border-bottom: 4px solid #808A95;
+    z-index: 10001;
+}
+
+.xlbootstrap3 #mainTopNavContainer.homework {
+    border-bottom: 4px solid #007a9c;
+}
+
+.xlbootstrap3 #mainTopNavContainer.test {
+    border-bottom: 4px solid #026056;
+}
+
+.xlbootstrap3 #mainTopNavContainer.quiz {
+    border-bottom: 4px solid #B00A4B;
+}
+
+.xlbootstrap3 #mainTopNavContainer.quizme {
+    border-bottom: 4px solid #B00A4B;
+}
+
+.xlbootstrap3 #mainTopNavContainer.studyplan {
+    border-bottom: 4px solid #391E83;
+}
+
+.xlbootstrap3 #mainTopNavContainer .course-title {
+    font-size: 18px;
+    font-weight: 500;
+    font-family: TT Commons;
+    color: #05112A;
+    line-height: 21px;
+}
+
+.xlbootstrap3 #mainTopNav .my_account_name{
+    font-weight: 400 !important;
+    font-family: Hind;
+    font-style: normal;
+    font-size: 16px !important;
+    color: #05112A;
+    line-height: 23px;
+}
+
+.xlbootstrap3 .navbar-text {
+    font-weight: 400;
+    font-family: Hind;
+    font-style: normal;
+    font-size: 16px;
+    color: #05112A;
+    line-height: 23px;
+}
+
+.xlbootstrap3 .navbar-inverse .navbar-text {
+    color: #05112A !important;
+}
+
+.xlbootstrap3 #mainTopNav .navbar-text.navbar-text-time {
+    width: 130px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.xlbootstrap3 #mainTopNavContainer #NavigationLinkKey_54, #NavigationLinkKey_61 {
+    display: none;
+}
+
+.xlbootstrap3 #mainTopNavContainer .fa-user {
+    display: none;
+}
+
+.xlbootstrap3 #mainTopNavContainer .fa-question-circle:before {
+    content: none;
+}
+
+.xlbootstrap3 #mainTopNavContainer .fa.fa-question-circle {
+    background-image: url(/images/xlicons/xlicon-pageheader-help.svg);
+    background-size: 100% 100%;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+}
+.xlbootstrap3 #mainTopNav > li > a:focus-visible {
+    outline: 2px solid #1472FF;
+    outline-offset: 4px;
+    border-radius: 18px;
+}
+
+.xlbootstrap3 #mainTopNavContainer .playerhelptopic {
+    line-height: 0px;
+}
+
+.xlbootstrap3 #mainTopNavContainer .helpLink {
+    padding-top: 1px;
+}
+
+.xlbootstrap3 .navbar-inverse .navbar-link {
+    padding:0px 3px;
+}
+
+.xlbootstrap3 .navbar-inverse .navbar-link:focus {
+    outline: 2px solid #1472FF;
+    outline-offset: 4px;
+    border-radius: 5px;
+}
+
+.xlbootstrap3 .dropdown-menu > li > a:focus {
+    outline: 2px solid #1472FF;
+}

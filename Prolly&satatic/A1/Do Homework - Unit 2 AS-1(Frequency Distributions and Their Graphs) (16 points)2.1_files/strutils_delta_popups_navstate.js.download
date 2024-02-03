@@ -1,0 +1,2463 @@
+/* Minification failed. Returning unminified contents.
+(1732,11-12): run-time error JS1005: Expected '(': {
+(1734,5-11): run-time error JS1006: Expected ')': return
+(1734,5-11): run-time error JS1008: Expected '{': return
+(1727,1-20): run-time error JS1301: End of file encountered before function is properly closed: function isXFrame()
+(2457,1): run-time error JS1107: Expecting more source characters
+ */
+
+function HTMLEncode(str) {
+    if (str == null)
+        return "";
+   var comp="";
+   var i = str.indexOf("&", 0);
+  while (i > -1) {
+    comp += str.substring(0, i+1) + "amp;";
+    str = str.substring(i+1, str.length);
+    i = str.indexOf("&", 0);
+  }
+    str = comp + str;
+  while (str.indexOf("<", 0) > -1)
+    str = str.replace("<", "&lt;");
+  while (str.indexOf(">", 0) > -1)
+    str = str.replace(">", "&gt;");
+  while (str.indexOf('"', 0) > -1)
+    str = str.replace('"', '&quot;');
+  return str;
+}
+
+// CA Poor man's HTML entity decode
+function HTMLDecode(s) {
+    return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+}
+
+function PadLeft(String,Length,PadChar)
+{
+ // **********************************************************
+ // Placed in the public domain by Affordable Production Tools
+ // April 1, 1998
+ // Web site: http://www.aptools.com/
+ //
+ // December 2, 1998 -- Modified to allow specification of
+ // pad character.
+ //
+ // This function accepts a number or string, and a number
+ // specifying the desired length. If the length is greater
+ // than the length of the value passed, the value is padded
+ // with spaces (default) or the specified pad character
+ // to the length specified.
+ //
+ // The function is useful in right justifying numbers or
+ // strings in HTML form fields.
+ // **********************************************************
+ String += ""       // Force argument to string.
+ Length += ""       // Force argument to string.
+ PadChar += ""      // Force argument to string.
+ if((PadChar == "") || (!(PadChar.length == 1)))
+  PadChar = " "
+ var Count = -1
+ var PadLength = 0
+ Length = parseInt(0 + Length,10)
+ if(Length <= String.length) // No padding necessary.
+  return(String)
+ PadLength = Length - String.length
+ for(Count = 0; Count < PadLength; Count++)
+  String = PadChar + String
+ return(String)
+}
+
+function TrimZeros(str, Separator) {
+    Separator += ""
+    if ((Separator == "") || (Separator.length > 1)) {
+        if (typeof (StrUtils_DecimalSeparator) != "undefined")
+            Separator = StrUtils_DecimalSeparator;
+        else
+            Separator = ".";
+    }
+  var ss = str.split(Separator);
+  if (ss.length == 2) {
+    var allZeros = true;
+    for (var i=0; i<ss[1].length; i++) {
+      if (ss[1].charAt(i) != '0') {
+        allZeros = false;
+        break;
+      }
+    }
+    if (allZeros) {
+      return ss[0];
+    }
+  }
+  return str;
+}
+
+function FormatNumberTrim(Number,Decimals,Separator) 
+{
+    var str = FormatNumber(Number, Decimals, Separator);
+    return TrimZeros(str, Separator);
+}
+
+function GetDecimalSeperator() {
+    if (typeof (StrUtils_DecimalSeparator) != "undefined")
+        Separator = StrUtils_DecimalSeparator;
+    else
+        Separator = ".";
+
+    return Separator;
+}
+
+function FormatNumber(Number,Decimals,Separator)
+{
+ // **********************************************************
+ // Placed in the public domain by Affordable Production Tools
+ // March 21, 1998
+ // Web site: http://www.aptools.com/
+ //
+ // November 24, 1998 -- Error which allowed a null value
+ // to remain null fixed. Now forces value to 0.
+ //
+ // October 28, 2001 -- Modified to provide leading 0 for fractional number
+ // less than 1.
+ //
+ // This function accepts a number to format and number
+ // specifying the number of decimal places to format to. May
+ // optionally use a separator other than '.' if specified.
+ //
+ // If no decimals are specified, the function defaults to
+ // two decimal places. If no number is passed, the function
+ // defaults to 0. Decimal separator defaults to '.' .
+ //
+ // If the number passed is too large to format as a decimal
+ // number (e.g.: 1.23e+25), or if the conversion process
+ // results in such a number, the original number is returned
+ // unchanged.
+ // **********************************************************
+ Number += ""          // Force argument to string.
+ Decimals += ""        // Force argument to string.
+ Separator += ""       // Force argument to string.
+ if ((Separator == "") || (Separator.length > 1)) {
+     if (typeof (StrUtils_DecimalSeparator) != "undefined")
+         Separator = StrUtils_DecimalSeparator;
+     else
+         Separator = ".";
+ }
+ if(Number.length == 0)
+  Number = "0"
+ var OriginalNumber = Number  // Save for number too large.
+ var Sign = 1
+ var Pad = ""
+ var Count = 0
+ // If no number passed, force number to 0.
+ if(parseFloat(Number)){
+  Number = parseFloat(Number)} else {
+  Number = 0}
+ // If no decimals passed, default decimals to 2.
+ if((parseInt(Decimals,10)) || (parseInt(Decimals,10) == 0)){
+  Decimals = parseInt(Decimals,10)} else {
+  Decimals = 2}
+ if(Number < 0)
+ {
+  Sign = -1         // Remember sign of Number.
+  Number *= Sign    // Force absolute value of Number.
+ }
+ if(Decimals < 0)
+  Decimals *= -1    // Force absolute value of Decimals.
+ // Next, convert number to rounded integer and force to string value.
+ // (Number contains 1 extra digit used to force rounding)
+ Number = "" + Math.floor(Number * Math.pow(10,Decimals + 1) + 5)
+ if((Number.substring(1,2) == '.')||((Number + '')=='NaN'))
+  return(OriginalNumber) // Number too large to format as specified.
+ // If length of Number is less than number of decimals requested +1,
+ // pad with zeros to requested length.
+ if(Number.length < Decimals +1) // Construct pad string.
+ {
+  for(Count = Number.length; Count <= Decimals; Count++)
+   Pad += "0"
+ }
+ Number = Pad + Number // Pad number as needed.
+ if(Decimals == 0){
+  // Drop extra digit -- Decimal portion is formatted.
+  Number = Number.substring(0, Number.length -1)} else {
+  // Or, format number with decimal point and drop extra decimal digit.
+ Number = Number.substring(0,Number.length - Decimals -1) +
+          Separator +
+          Number.substring(Number.length - Decimals -1,
+          Number.length - 1)
+}
+var ValidNumber = Number.replace(Separator, ".");
+ if((Number == "") || (parseFloat(ValidNumber) < 1))
+  Number="0"+Number // Force leading 0 for |Number| less than 1.
+ if(Sign == -1)
+  Number = "-" + Number  // Set sign of number.
+ return(Number)
+}
+
+function LeftTrim(String)
+{
+ String += ""         // Force argument to string.
+ TrimChar = " "
+ if(String.length == 0)
+  return(String)
+ var Count = 0
+ for(Count = 0;Count < String.length;Count++)
+ {
+  if(!(String.charAt(Count) == TrimChar))
+   return(String.substring(Count,String.length))
+ }
+ return("")
+}
+
+function RightTrim(String)
+{
+ String += ""        // Force argument to string.
+ TrimChar = " "
+ if(String.length == 0)
+  return(String)
+ var Count = 0
+ for(Count = String.length -1;Count >= 0;Count--)
+ {
+  if(!(String.charAt(Count) == TrimChar))
+   return(String.substring(0,Count + 1))
+ }
+ return("")
+}
+
+function Trim(String)
+{
+ return(RightTrim(LeftTrim(String)))
+}
+
+function GetTimeStr(time) {
+   h = time.getHours();
+   m = time.getMinutes();
+   s = time.getSeconds();
+   timeStr  =  (h > 12) ? h - 12 : h;
+   if (timeStr == "0") timeStr = "12";
+   timeStr += ((m < 10) ? ":0" : ":") + m;
+   timeStr += ((s < 10) ? ":0" : ":") + s;
+   timeStr +=  (h > 12) ? " PM": " AM";
+   return timeStr
+}
+
+function GetDateStr(date) {
+   m = date.getMonth()+1;
+   d = date.getDate();
+   y = takeYear(date);
+   dateStr = ((m < 10) ? "0" : "") + m;
+   dateStr += ((d < 10) ? "/0" : "/") + d;
+   dateStr +=  (y < 10) ? "/0": "/" + y;
+   return dateStr
+}
+
+// Use this to get the correct year after 1999
+//http://www.quirksmode.org/js/introdate.html#year
+function takeYear(theDate) {
+	x = theDate.getYear();
+	var y = x % 100;
+	y += (y < 38) ? 2000 : 1900;
+	return y;
+}
+
+function TimeSpanToString(duration,showSeconds) {
+   var hours = Math.floor(duration / 3600);
+   duration -= hours * 3600;
+   var minutes;
+   var seconds = 0;
+   if (showSeconds)
+   {
+     minutes = Math.floor(duration / 60);
+   }
+   else
+   {
+     minutes = Math.round(duration / 60.0);
+   }
+
+   duration -= minutes * 60;
+   seconds = duration;
+
+   var str = "";
+   if (hours != 0) str += hours + "h";
+   if (minutes != 0)
+   {
+     if (hours > 0) str +=" ";
+     str += minutes + "m";
+   }
+   else if (!showSeconds && (hours == 0) && (seconds > 0))
+   {
+     str += "<1m";
+   }
+
+   if (showSeconds && seconds != 0)
+   {
+     if (str.length > 0) str += " ";
+     str += seconds + "s";
+   }
+
+   return str;
+
+}
+
+function TrimString(sInString) {
+  sInString = sInString.replace( /^\s+/g, "" );// strip leading
+  return sInString.replace( /\s+$/g, "" );// strip trailing
+}
+
+
+function GetChaptersCoveredCondensed(chapters)
+{
+    var lastChapter, lastWrittenChapter;
+    var w_Continue, w_StartPos, w_Length, w_Delimeter_pos, w_tmp_int;
+    var w_tmp_num, w_tmp_txt, w_Delimeter_Len, p_Delimeter;
+    var retval="";
+
+    p_Delimeter = ",";
+    lastChapter=-1;
+    lastWrittenChapter=-1;
+    w_tmp_int=-1;
+
+    if (chapters.length==0)
+    {
+        w_Continue=0; //force early exit
+    }
+    else
+    {
+        //-- parse the original @p_SourceText array into a temp table
+        w_Continue = 1;
+        w_StartPos = 0;
+        chapters = TrimString(chapters);
+        w_Length   = chapters.length;
+        w_Delimeter_Len = p_Delimeter.length;
+    }
+    var scount=0;
+    
+    while ((w_Continue == 1) && (scount<50))
+    {
+        w_Delimeter_pos=chapters.indexOf(p_Delimeter);
+        if (w_Delimeter_pos > 0)  //-- delimeter(s) found, get the value
+        {
+            w_tmp_txt=chapters.substring(0, (w_Delimeter_pos));
+            if (w_tmp_txt)
+            {
+                w_tmp_int = w_tmp_txt * 1;  //"cast" as int
+                w_tmp_num = w_tmp_txt * 1;  //"cast" as int
+            } //-- end if w_tmp_txt is numeric
+            else
+            {
+                w_tmp_int =  null;
+                w_tmp_num =  null;
+            }
+        }
+        else //-- No more delimeters, get last value
+        {
+           w_tmp_txt=chapters;
+           if (w_tmp_txt)
+           {
+            w_tmp_int = w_tmp_txt * 1;  //"cast" as int
+            w_tmp_num = w_tmp_txt * 1;  //"cast" as int
+           }
+           else
+           {
+            w_tmp_int =  null;
+            w_tmp_num =  null;
+           }
+           w_Continue = 0;
+        }
+    
+    if (w_tmp_int < 0)
+        w_tmp_int=w_tmp_int * -1;
+
+    if (retval=="")
+    {        
+        retval=w_tmp_int;
+        lastWrittenChapter=w_tmp_int;
+    }
+    else 
+    {
+        if (w_tmp_int > lastChapter + 1)
+        {
+            if (lastChapter !=lastWrittenChapter)
+            {
+                retval=retval + '-' + lastChapter;
+                lastWrittenChapter=lastChapter;
+            }
+            retval=retval + ', ' + w_tmp_int;
+            lastWrittenChapter=w_tmp_int;
+        }
+    }
+    
+    lastChapter=w_tmp_int;
+    scount++;
+    chapters=chapters.substring(chapters.indexOf(p_Delimeter) + 1, chapters.length);
+} //--END WHILE LOOP
+
+    if ((w_tmp_int>-1) && (lastWrittenChapter!=w_tmp_int))
+    {
+        if (lastWrittenChapter<lastChapter-1)
+            retval=retval + '-' + w_tmp_int;
+        else
+            retval=retval + ', ' + w_tmp_txt;
+    }
+    
+    return retval;
+
+}
+
+function GetChaptersCoveredCondensedAlias(chapters, chapterAliasArray)
+{
+    var lastChapter, lastWrittenChapter;
+    var w_Continue, w_StartPos, w_Length, w_Delimeter_pos, w_tmp_int;
+    var w_tmp_num, w_tmp_txt, w_Delimeter_Len, p_Delimeter;
+    var retval="";
+    p_Delimeter = ",";
+    lastChapter=-1;
+    lastWrittenChapter=-1;
+    w_tmp_int=-1;
+
+    if (chapters.length==0)
+    {
+        w_Continue=0; //force early exit
+    }
+    else
+    {
+        //-- parse the original @p_SourceText array into a temp table
+        w_Continue = 1;
+        w_StartPos = 0;
+        chapters = TrimString(chapters);
+        w_Length   = chapters.length;
+        w_Delimeter_Len = p_Delimeter.length;
+    }
+    var scount=0;
+    
+    while ((w_Continue == 1) && (scount<50))
+    {
+        w_Delimeter_pos=chapters.indexOf(p_Delimeter);
+        if (w_Delimeter_pos > 0)  //-- delimeter(s) found, get the value
+        {
+            w_tmp_txt=chapters.substring(0, (w_Delimeter_pos));
+            if (w_tmp_txt)
+            {
+                w_tmp_int = w_tmp_txt * 1;  //"cast" as int
+                w_tmp_num = w_tmp_txt * 1;  //"cast" as int
+            } //-- end if w_tmp_txt is numeric
+            else
+            {
+                w_tmp_int =  null;
+                w_tmp_num =  null;
+            }
+        }
+        else //-- No more delimeters, get last value
+        {
+           w_tmp_txt=chapters;
+           if (w_tmp_txt)
+           {
+            w_tmp_int = w_tmp_txt * 1;  //"cast" as int
+            w_tmp_num = w_tmp_txt * 1;  //"cast" as int
+           }
+           else
+           {
+            w_tmp_int =  null;
+            w_tmp_num =  null;
+           }
+           w_Continue = 0;
+        }
+    
+    if (w_tmp_int < 0)
+        w_tmp_int=w_tmp_int * -1;
+
+    if (retval=="")
+    {   
+    
+        if (chapterAliasArray[w_tmp_int])
+            retval=chapterAliasArray[w_tmp_int]
+        else
+            retval=w_tmp_int;
+        lastWrittenChapter=w_tmp_int;
+    }
+    else 
+    {
+        if (w_tmp_int > lastChapter + 1)
+        {
+            if (lastChapter !=lastWrittenChapter)
+            {
+                if (chapterAliasArray[lastChapter])
+                    retval=retval + '-' + chapterAliasArray[lastChapter];
+                else
+                    retval=retval + '-' + lastChapter;
+                    
+                lastWrittenChapter=lastChapter;
+            }
+            if (chapterAliasArray[w_tmp_int])
+                retval=retval + ', ' + chapterAliasArray[w_tmp_int];
+            else
+                retval=retval + ', ' + w_tmp_int;
+            lastWrittenChapter=w_tmp_int;
+        }
+    }
+    
+    lastChapter=w_tmp_int;
+    scount++;
+    chapters=chapters.substring(chapters.indexOf(p_Delimeter) + 1, chapters.length);
+} //--END WHILE LOOP
+
+    if ((w_tmp_int>-1) && (lastWrittenChapter!=w_tmp_int))
+    {
+        if (lastWrittenChapter<lastChapter-1)
+        {
+            if (chapterAliasArray[w_tmp_int])
+                retval=retval + '-' + chapterAliasArray[w_tmp_int];
+            else
+                retval=retval + '-' + w_tmp_int;
+        }
+        else
+        {
+            if (chapterAliasArray[w_tmp_int])
+                retval=retval + ', ' + chapterAliasArray[w_tmp_int];
+            else
+                retval=retval + ', ' + w_tmp_txt;
+        }
+    }
+
+    return retval;
+
+}
+
+// Returns true if a string contains only whitespace characters
+function isblank(s)
+{
+  for (var i=0; i < s.length; i++ )
+  {
+    var c = s.charAt(i);
+    if ((c !=' ') && (c != '\n') && (c !='\t')) return false;
+  }
+  return true;
+}
+
+
+function isvaliddatetime(dateStr)
+{
+  return isvaliddate(dateStr,true);
+}
+
+function isvaliddate(dateStr,withTime)
+{
+  // Checks for the following valid date formats:
+  // MM/DD/YY   MM/DD/YYYY   MM-DD-YY   MM-DD-YYYY
+  // Also separates pieces into variables
+  // Time formats are:
+  // h:mm AM/PM hh:mm AM/PM h:mm:ss AM/PM hh:mm:ss AM/PM
+
+  // TODO: 24 hour time support?
+
+  var datePat;
+
+  // To require a 4 digit year entry, use this line instead:
+  // var datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
+  if (withTime)
+  	datePat = /^(\d{1,2})(\/)(\d{1,2})\2(\d{2}|\d{4})\s(\d{1,2}):(\d{2})(:(\d{2}))?\s(AM|PM)$/;
+  	//datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{2}|\d{4})\s(\d{1,2}):(\d{2})(:(\d{2}))?\s(AM|PM)$/;
+  else
+    datePat = /^(\d{1,2})(\/)(\d{1,2})\2(\d{2}|\d{4})$/;
+    //datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{2}|\d{4})$/;
+
+  var matchArray = dateStr.match(datePat); // is the format ok?
+  if (matchArray == null) 
+  {
+    return false;
+  }
+  month = matchArray[1]; // parse date into variables
+  day = matchArray[3];
+  year = Number(matchArray[4]);
+  if (year<80)
+    year = 1900 + year;
+  else if (year<100)
+    year = 2000 + year;
+
+  if (withTime)
+  {
+    hours = matchArray[5];
+  	minutes = matchArray[6];
+  	seconds = matchArray[8]; // optional
+  	ampm = matchArray[9];
+
+    // 0 is midnight according to SQL.  Let them put it in
+    if (hours<0 || hours > 12)
+    {
+    return false;
+    }
+  	if (minutes <0 || minutes > 59)
+  	{
+  	  return false;
+  	}
+  	if (seconds!='' && (seconds<0 || seconds > 59) )
+  	{
+  	  return false;
+  	}
+  }
+
+  if (month < 1 || month > 12) 
+  {
+    return false;
+  }
+  if (day < 1 || day > 31) 
+  {
+    return false;
+  }
+  if ((month==4 || month==6 || month==9 || month==11) && day==31) 
+  {
+    return false
+  } 
+  if (month == 2) // check for leap year
+  { 
+    var isleap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+    if (day>29 || (day==29 && !isleap)) 
+    {
+      return false;
+    }
+  }
+  if (year > 2078 || year < 1900) {
+    return false;
+  }  
+  return true;
+}
+
+
+
+// 1: valid
+// 0:  blank
+// -1: not an integer
+// -2: less than min
+// -3: greater than max
+function isvalidinteger(value,min,max) {
+var v;
+
+  v = parseInt(value);
+
+  if (value=="")
+    return 0;
+  else if (isNaN(v) || value!=v)
+    return -1;
+  else if (min && v<min)
+    return -2;  
+  else if (max && v>max)
+    return -3;
+  else
+    return 1;
+}
+
+function parseFloatLocalized(value) {
+    if (typeof (value) == "string")
+        // Comment 21198 - Needed to replace use of "Separator" variable with call to get decimal separator.
+        value = value.replace(GetDecimalSeperator(), ".");
+    return parseFloat(value);
+}
+
+// 1: valid
+// 0:  blank
+// -1: not an integer
+// -2: less than min
+// -3: greater than max
+function isvalidfloat(value,min,max) {
+var v;
+
+v = parseFloatLocalized(value);
+
+  if (value=="")
+    return 0;
+  else if (isNaN(v) || value!=v)
+    return -1;
+  else if (min && v<min)
+    return -2;
+  else if (max && v>max)
+    return -3;
+  else
+    return 1;
+}
+
+function showProps(o, objName) {
+  var win
+  win = window.open("",objName,"width=300,height=300,resizable,scrollbars")
+  win.document.open();
+  win.document.write("<HTML>");
+  win.document.write("<XMP>")
+  var result = ""
+  count = 0
+  for (var i in o) {
+    result = objName + "." + i + "=" + o[i] + "\n"
+         win.document.write(result)
+  }
+  win.document.write("</XMP>")
+  win.document.close()
+}
+
+// Remove parameter from reqstr
+function removeParam(reqstr,param)
+{
+  var evstr, dest;
+  dest = new String(reqstr); 
+
+  // strip out existing parameter
+  //FOUND A BUG MAD 10/25/00
+  //Routine did not handle "param=" at end of string
+  //evstr = "dest = dest.replace(/[\\?|\\&]"+param+"=[^\\&]+/ig,\"\");"
+  // AAL 09/29/03 Wasn't handling blank params, removed $
+  //evstr = "dest = dest.replace(/[\\?|\\&]"+param+"=(([^\\&]+)|\s*$)/ig,\"\");"
+  // AAL 4/6/05 if needed I think we can use this to not require a ? or & at start
+  // evstr = "regexp = /[\\?|\\&]*"+param+"=([^\\&]+)/;"  
+  evstr = "dest = dest.replace(/[\\?|\\&]"+param+"=(([^\\&]+)|\s*)/ig,\"\");"
+  eval(evstr);
+
+  // if we stripped out the first param, make the following param have the ampersand
+  if (dest.indexOf("?")==-1 && dest.indexOf("&")!=-1)
+    dest = dest.replace(/\&/,"?");
+
+  return dest;
+}
+
+function InitCap(str) {
+    /* First letter as uppercase, rest lower */
+    var str = str.substring(0, 1).toUpperCase() + str.substring(1, str.length).toLowerCase();
+
+    return str;
+}
+
+// CA Delimited string functions originating from SiteBuilderNet
+function buildDelimittedString(array) {
+    var i;
+    var sList = new Array();
+    var str;
+    for (i = 0; i < array.length; i++) {
+        str = String(array[i]);
+        sList.push(str.length);
+        sList.push("|");
+        sList.push(str);
+    }
+    return sList.join("");
+}
+
+function parseDelimittedString(str) {
+    var sList = new Array();
+    var pos;
+    var lastPos = 0;
+    var nChars;
+
+    if (str && str.length > 0) {
+        do {
+            pos = str.indexOf("|", lastPos);
+            if (pos >= 0) {
+
+                nChars = parseInt(str.substr(lastPos, pos - lastPos));
+
+                sList.push(str.substr(pos + 1, nChars));
+                lastPos = pos + nChars + 1;
+            }
+
+        } while (pos >= 0);
+    }
+
+    return sList;
+}
+
+function toJson(obj) {
+    if (JSON && JSON.stringify) {
+        return JSON.stringify(obj);
+    }
+}
+
+function fomJson(json) {
+    if (JSON && JSON.stringify) {
+        return JSON.stringify(obj);
+    }
+};
+LOCNS.LocMap.RegRes("common/delta_1.js", "AdminActionMemberWarning", "The action you have taken will be applied to all the member courses in your group.  Are you sure you want to proceed?");
+LOCNS.LocMap.RegRes("resources", "Cancel", "Cancel");
+LOCNS.LocMap.RegRes("resources", "OK", "OK");
+
+ var SubCheck_AllowSubmit = true;
+ var AdminActionMemberWarning = LOCNS.LocMap.GetRes("common/delta_1.js","AdminActionMemberWarning");
+ var Hide_Scrollbars = Hide_Scrollbars || false;
+  
+ function SubCheckSubmit(el)
+ {
+   if (typeof(Page_ClientValidate) == 'function' && !Page_ClientValidate()) 
+     return false;
+   if(!SubCheck_AllowSubmit) 
+     return false;
+   SubCheck_AllowSubmit = false;
+   
+   return true;
+ }
+ 
+ function SubAllowSubmit()
+ {
+   SubCheck_AllowSubmit = true;
+ }
+
+function doNotImplemented() {
+  alert("This feature has not yet been implemented.");
+}
+
+function doHelp(topicname, target, options) {
+    if (window.hasOwnProperty('IsZoomInAvailable') && IsZoomInAvailable == "true" && !isTheTopicExcludeForZoomIn(topicname)) {
+        doHelpZoomIn();
+    }
+    else {
+        doHelpLegacy(topicname, target, options);
+    }
+}
+
+function isTheTopicExcludeForZoomIn(topicname) {
+    if (window.hasOwnProperty('ZoomInExcludedTopics')) {
+        return ZoomInExcludedTopics.includes(topicname);
+    }
+}
+
+function doHelpLegacy(topicname, target, options) {
+    // Comment 9841 - ignoring uppercase HTTPS.  should never happen due to our redirect
+    var url = BaseAbsUrl + "/info/Help.aspx?topic=" + escape(topicname);
+    if (target) url += "&target=" + escape(target);
+    var options = options || { Width: 600, Height: 600, AutoClose: false };
+    popupWindow("help", url, options);
+}
+
+function doHelpZoomIn() {
+    window.iph('open');
+}
+
+(function (w, d, s, o, f, js, fjs) {
+    w['InProductHelp'] = o; w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+    js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+    js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
+}(window, document, 'script', 'iph', '//iph.zoominsoftware.io/widget.js'));
+iph('init', {
+    id: ZoomInWidgetId,
+    host: ZoomInHostUrl,
+    widgetSettings: {
+        sfCommunityUrl: 'https://support.pearson.com/getsupport/',
+        topicPageConfig: {
+            actions: {
+                subheader: {
+                    openInSFCommunity: true,
+                }
+            }
+        }
+    }
+});
+
+function doAnchorHelpForZoomIn(bookmark)
+{
+    if (bookmark.hash.indexOf('#') == 0) {
+        var pageUrl = window.location.origin + window.location.pathname + window.location.search;
+        var absoluteUrl = pageUrl + bookmark.hash;
+        bookmark.href = absoluteUrl;
+    }
+    
+}
+
+//For Edit Account window
+function DoHelp(url) {
+    if (url)
+        popupWindow("HelpWindow", url, { Width: 790, Height: 490 });
+}
+
+function printElement(elem, append, delimiter) {
+    var clone = elem.clone();
+    clone.removeAttr("id");
+
+    var $printSection = $("#printSection");
+
+    if (!$printSection.length) {
+        $("body").append("<div id='printSection'>");
+        $printSection = $("#printSection");
+    }
+
+    if (append !== true) {
+        $printSection.html("");
+    }
+    else if (append === true) {
+        $printSection.append(delimiter);
+    }
+
+    $printSection.append(clone);
+};
+
+function doPrint() {
+   window.print();
+}
+
+function doModalWindowPrint() {
+    $('body').css('visibility', 'hidden');
+    window.print();
+    $('body').css('visibility', 'visible');
+}
+function doMemberList(courseId) {
+  popupWindow("memberlist","CourseMemberList.aspx?cId="+courseId,{Width:560});
+}
+
+function doDocumentUpload(courseId) 
+{
+    //alert("doDocumentUpload()");
+}
+
+
+var jsclockServerDateTime = "";
+var jsclockTdiff = 0;
+var jsclockElementId = "";
+var jsclockElementSecondId = "";
+var jsclockConstantUpdate = false;
+var isSelfStudyCourse = "False";
+
+// pass a string for the time zone adjusted datetime from the server
+// usually CurrentAdjustedDateTimeString from IntelliPage
+// elementId - ID of the div or span holding the time
+// constUpdate=true - keep the clock running and live
+function initClock() {
+    if (isSelfStudyCourse == "True" || isSelfStudyCourse == "true")
+        d1 = new Date();
+    else
+        d1 = Date.parse(jsclockServerDateTime);
+    d2 = new Date();
+    jsclockTdiff = d2.valueOf() - d1;
+    
+    updateClock();
+}
+
+function updateClock() {
+    var dNow = new Date();
+    var Digital = new Date(dNow.valueOf() - jsclockTdiff);
+    var clockRef = document.getElementById(jsclockElementId);
+    var updateFreq = 1000;
+    var clockRef2 = null;
+    if (jsclockElementSecondId != "") {
+        clockRef2 = document.getElementById(jsclockElementSecondId);
+    }
+    if (clockRef) {
+        clockRef.innerHTML = formatLocalDate(Digital, LocClockPattern);
+        updateFreq = 10000;
+    }
+    if (clockRef2) {
+        clockRef2.innerHTML = formatLocalDate(Digital, LocClockPattern);
+        updateFreq = 10000;
+    }
+    if (jsclockConstantUpdate) {
+        setTimeout(updateClock, updateFreq);
+    }
+
+}
+
+function getCurrentCourseTime() {
+    var dNow = new Date();
+    var Digital = new Date(dNow.valueOf() - jsclockTdiff);
+    return Digital;
+}
+
+var wizardUrl="";
+var supportLink="";
+
+function doError(message,title,target,options)
+{
+
+/*
+  options.Legend   - Determines if legend is shown or not.    Default = false;
+  options.Help     - Determines if help button shown or not.  Default = false;
+*/
+  var legend  = false;
+  var help    = false;
+  var print   = false;
+
+  if (typeof(options) != "undefined") {
+    if (typeof(options.Legend) != "undefined") legend = options.Legend;
+    if (typeof(options.Help) != "undefined") help = options.Help;
+    if (typeof(options.Print) != "undefined") print = options.Print;    
+  }
+
+  var errorUrl = BaseUrl+"Student/Error.aspx";
+  var params = "?message="+escape(message)+"&popup=yes&legend="+legend+"&help="+help+"&print="+print;
+  
+  if (title)
+    params += "&title="+escape(title);
+  if (target)
+    params += "&target="+escape(target);
+    
+  popupWindow("doerror",errorUrl+params,{Width:500});
+}
+
+function doErrorMessage(mode) {
+    var errorUrl = BaseUrl + "info/Message.aspx";
+    var params = "?mode=" + escape(mode)
+    popupWindow("doerror", errorUrl + params, { Width: 500 });
+}
+
+function goRetired(profview)
+{
+    //XL-2879: this retired popup is no longer used; should not get called; leaving the English here just in case. No need to localize it.
+    if (profview) {
+        alert("We're sorry. This course has been retired and this question type is no longer supported. Please contact Educator Support (1-888-695-6577) for more information.");
+        return;
+    }
+    alert("We're sorry. This course has been retired and this question type is no longer supported. Please contact your instructor for more information.");
+}
+
+function goSupport()
+{
+  popupWindow("support",supportLink,{Width:1024,Height:768});
+}
+
+
+function goWizard(params)
+{
+  if (!params)
+      params = "";
+  popupWindow("iwiz",wizardUrl+params,{Width:780,Height:535,AutoClose:false});
+}
+function goWizardNG(params)
+{
+  if (!params)
+    params = "";
+
+  popupWindow("iwiz", wizardUrl + params, { Width: 780, AutoClose: false });
+}
+function goSysReqForce(forceWiz)
+{
+  var params="forceReq=1&forceWiz=" + forceWiz;
+  popupWindow("iwiz",wizardUrl+"?" + escape(params),{Width:620,Height:400,AutoClose:false});
+}
+function goWizardCourse(courseId)
+{
+  var params = "?courseId="+courseId;
+
+  goWizard(params);
+}
+
+function goWizardCourseNG(courseId, excludeTG, lang, lockdownBrowserType, smsPool, clientID, ssoType, sessionIdleTimeoutSeconds)
+{
+    var params = "?courseId=" + courseId + "&excludeTG=" + excludeTG + "&lang=" + lang + "&smsPool=" + smsPool + "&clientId=" + clientID + "&ssoType=" + ssoType + "&sessionIdleTimeoutSeconds=" + sessionIdleTimeoutSeconds;
+
+    if (typeof (lockdownBrowserType) != "undefined" && lockdownBrowserType != '' && lockdownBrowserType != "None")
+        params += "&lockdownBrowserType=" + lockdownBrowserType;
+    else
+        params += "&lockdownBrowserType=None";
+
+  goWizardNG(params);
+}
+
+function goWizardBookNG(bookId, lang)
+{
+  var params = "?bookId="+bookId+"&lang="+lang;
+  goWizardNG(params);        
+}
+function goWizardBook(bookId)
+{
+  var params = "?bookId="+bookId;
+  goWizard(params);        
+}
+
+function goWizardBookCode(bookCode)
+{
+  var params = "?bookCode="+bookCode;
+  goWizard(params);        
+}
+
+function goWizardBookCodeNG(bookCode)
+{
+  // TODO - Do we need a lang here?
+  var params = "?bookCode="+bookCode;
+  goWizardNG(params);        
+}
+
+function goWizardForce(forceWiz)
+{
+  var params = "?forceWiz="+forceWiz;
+  goWizard(params);                
+}
+
+function goHowToEnterAnswers(discipline)
+{
+    var url = "http://media.pearsoncmg.com/cmg/pmmg/pmmg_mml_shared/enter_answers.html";
+    if (discipline == "nextgen_acct") // Comment 12816
+    {
+        url = "http://media.pearsoncmg.com/ph/bp/bp_mal_shared/tours/how_to_enter.html";
+        popupWindow("howto", url, { Width: 560, Height: 560 });
+        return;
+    }
+    popupWindow("howto",url,{Width:780,Height:500});
+}
+
+function goHowToEnterAnswersGlobal(culture) {
+    var url;
+    if (culture == "es")
+        url = "http://media.pearsoncmg.com/cmg/pmmg/player_tour/enteranswers_espanol.html";
+    else if (culture == "pt")
+        url = "http://media.pearsoncmg.com/cmg/pmmg/player_tour/brasil/enteranswers_brasil.html";
+    else if (culture == "en" || culture == "uk")
+        url = "http://media.pearsoncmg.com/cmg/pmmg/player_tour/uk_schools/enteranswers_uk_schools.html";
+    else if (culture == "enie")
+        url = "http://media.pearsoncmg.com/intl/ema/mml_global/tour/index.html";
+    else if (culture == "it")
+    {
+        url = "http://pearson.it/mml/come-rispondere.htm"; // placeholder
+        popupWindow("howto", url, { Width: 990, Height: 650 });
+        return;
+    }
+    popupWindow("howto", url, { Width: 920, Height: 610 });
+}
+
+function goMyPlaces(username) {
+    var url = "http://www.mypearsonplaces.com/home";
+    if (username != null && username.length > 0)
+        url = "http://www.mypearsonplaces.com/home?loginname=" + escape(username);
+    popupWindow("myplaces", url, { Width: 1050, Height: 670, AutoClose: false });
+}
+
+function goOnlineSurvey(discipline) 
+{
+    var url = "http://www.surveymonkey.com/s/MathXLStudentSurvey";
+    if (discipline == "mymathlab")
+        // XL-4149 : Change URL for Student Survey in the default MML Annoucements & remove Learning Catalytics
+    //url = "http://www.surveymonkey.com/s/MMLStudentSurvey"; 
+        url = "http://www.statcrunch.com/5.0/survey.php?surveyid=6794&code=WPFQZ";
+    else if (discipline == "myfoundationslab")
+        url = "http://www.surveymonkey.com/s/mflstusurvey";
+    else if (discipline == "accuplacer")
+        url = "http://www.surveymonkey.com/s/R5963YQ";
+    popupWindow("onlinesurvey", url, { Width: 850, Height: 760 });
+}
+
+function goTutorServices(discipline, contentArea)
+{
+    var url = BaseUrl+"Student/ConnectToTutor.aspx?view=announcement";
+    if (discipline == "myfoundationslab" || discipline == "accuplacer") 
+    {
+        if (contentArea == "math")
+        {
+            url = "https://media.pearsoncmg.com/cmg/pmmg/pmmg_mml_shared/mtc_tv_mfl.html";
+        }
+        else if (contentArea == "writing")
+        {
+            url = "https://media.pearsoncmg.com/cmg/pmmg/pmmg_mml_shared/mwl_tv_mfl.html";
+            popupWindow("tutorServices", url, { Width: 1120, Height: 700 });
+            return;
+        }
+    }
+    popupWindow("tutorServices", url, { Width: 1024, Height: 768 });
+}
+
+function goTutorServicesMyMathLab()
+{
+    var url = BaseUrl + "Student/TutorServicesMyMathLab.aspx?source=announcement";
+    popupWindow("tutorServicesMyMathLab", url, { Width: 1024, Height: 768 });
+}
+
+function goTakeATour(discipline)
+{
+    var url = "http://media.pearsoncmg.com/cmg/pmmg_mml_shared/mfdl/tours/get_started/mfdl_get_started.html";
+    if (discipline == "accuplacer")
+        url = "http://media.pearsoncmg.com/cmg/pmmg_mml_shared/mfdl/tours/get_started/accu_mfdl/get_started.html";
+    
+    popupWindow("takeATour", url, { Width: 900, Height: 530 });
+}
+
+function formatStudyPlanUrl(studyPlanUrl, queryString) {
+    var urlParts = studyPlanUrl.split(/[#]/);
+    var url = urlParts[0];
+    if (urlParts.length > 1) {
+        url += queryString + "#" + urlParts[1];
+    } else {
+        url += queryString;
+    }
+    return url;
+}
+
+function goStudyPlan()
+{
+    location = "StudyPlan.aspx";
+}
+
+function goCompanionStudyPlan(studyPlanUrl, studyPlanAssignmentId, courseId, userId, testId)
+{
+    var params = "";
+    if (courseId && userId)
+        params = "?courseId=" + courseId + "&userId=" + userId + "&studyPlanAssignmentId=" + studyPlanAssignmentId + "&testId=" + testId;
+    else
+        params = "?studyPlanAssignmentId=" + studyPlanAssignmentId + "&testId=" + testId;
+
+    location = formatStudyPlanUrl(studyPlanUrl, params);
+}
+
+function goIA(assignmentType, assignmentId, isMedia)
+{
+    var url = "";
+    var params = "?view=" + assignmentType + "&assignmentId=" + assignmentId;
+    if (isMedia)
+        params += "&isMedia=yes";
+    //if (!isMedia && (assignmentType==1 || assignmentType==4 || assignmentType == 12))
+    //    url = "ItemAnalysisAttemptsPopup.aspx" + params;
+    //else
+    url = "ItemAnalysisPopup.aspx" + params;
+    location = url;
+}
+
+function goDoAssignments(params)
+{
+    var url = "DoAssignments.aspx";
+    if(params)
+        url += "?"+params;
+    
+    location = url;
+}
+
+function goStudyCenter()
+{
+     alert('Student Center');
+}
+
+function fixScrollbars(win,fixHorizontal) {
+
+  if ( typeof(win) != "undefined" && win && win.document) {
+    //This must be a window so use it
+  } else {
+    win = window;
+  }
+  
+  if( win.document.documentElement
+      && win.document.documentElement.scrollHeight
+      && win.document.documentElement.clientHeight) {
+    if (Hide_Scrollbars || win.document.documentElement.scrollHeight <= win.document.documentElement.clientHeight ) {
+	      win.document.documentElement.style.overflowY = 'hidden';
+    } else {
+	      win.document.documentElement.style.overflowY = 'scroll';
+    }
+    
+    if (typeof(fixHorizontal) != "undefined" && fixHorizontal) {
+        //Apparently, you don't need to fool with horizontal if we don't use frames.   
+        if (win.document.documentElement.scrollWidth <= win.document.documentElement.clientWidth ) {
+            win.document.documentElement.style.overflowX = 'hidden';
+        } else {
+            win.document.documentElement.style.overflowX = 'scroll';
+        }
+    }
+  }
+}
+
+function setupScrollbarFix() {
+  //Only check for the IE version since this only breaks in IE
+  if(window.attachEvent) { 
+    window.attachEvent("onload",fixScrollbars); 
+    window.attachEvent("onresize",fixScrollbars);
+  }
+}
+
+function ShowWeightWarning(catId)
+{
+    popupWindow("ZeroWeightWarning","WeightWarning.aspx?catId=" + catId,{Width:450,Scrollbar:false,Statusbar:false});
+}
+
+function stripHTML(str)
+{
+    str=str.replace(/(<([^>]+)>)/ig,"");
+    var dubQuot = /\"/g;
+    str=str.replace(dubQuot, "&quote;");
+    str=str.replace("<", "&lt;");
+    str=str.replace(">", "&gt;");
+    return str;
+}
+
+function validateName(str) {
+    str = stripHTML(str);
+    str = str.replace("&#", "");
+    return str;
+}
+
+function deltaBack() {
+  if (BackUrl != "") {
+    location = BackUrl
+  } else {
+    history.back();
+  }
+}
+
+function unloadRequest(url, async) {
+    //console.log("Calling unloadRequest:" + url);
+    if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+    } else {
+        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    if (xhr == null) {
+        alert("Your browser doesn't support AJAX.");
+        return false;
+    }
+
+    if (url.indexOf("?") > -1)
+        url = url + "&r=" + parseInt(Math.random() * 99999999);
+    else
+        url = url + "?r=" + parseInt(Math.random() * 99999999);
+
+    xhr.open("GET", url, async);
+    xhr.send(null);
+}
+
+//***showElement based on ID (string) or object reference
+
+function showElement(o) {
+    if (typeof (o) == "string") {
+        document.getElementById(o).style.display = "";
+    } else {
+        o.style.display = "";
+    }
+}
+function showElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el)
+            el.style.display = "";
+    } else {
+        o.style.display = "";
+    }
+}
+//***hideElement based on ID (string) or object reference
+
+function EnableControl(cid) {
+    var c = document.getElementById(cid);
+
+    if (c)
+        c.disabled = false;
+}
+
+function hideElement(o) {
+    if (typeof (o) == "string") {
+        document.getElementById(o).style.display = "none";
+    } else {
+        o.style.display = "none";
+    }
+}
+
+function hideElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el)
+            el.style.display = "none";
+    } else {
+        o.style.display = "none";
+    }
+}
+
+function setElementVisibility(ele, visible) {
+    if (visible)
+        showElementIfExists(ele);
+	else
+        hideElementIfExists(ele);
+}
+
+function checkElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el)
+            el.checked = true;
+    } else {
+        o.checked = true;
+    }
+}
+
+function uncheckElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el)
+            el.checked = false;
+    } else {
+        o.checked = false;
+    }
+}
+
+function enableElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el) {
+            el.disabled = false;
+            el.className = "";
+        }
+    } else {
+        o.disabled = false;
+        o.className = "";
+    }
+}
+
+function disableElementIfExists(o) {
+    if (typeof (o) == "string") {
+        var el = document.getElementById(o);
+        if (el) {
+            el.disabled = true;
+            el.className = "disabled";
+        }
+    } else {
+        o.disabled = true;
+        o.className = "disabled";
+    }
+}
+
+function disableCheckboxIfExists(chk, checked) {
+    if (checked)
+        checkElementIfExists(chk);
+    else
+        uncheckElementIfExists(chk);
+
+    disableElementIfExists(chk);
+}
+
+function setupFUSLinks() {
+    if (typeof jQuery == 'undefined') {
+        alert('jQuery must be included to use this link');
+        return;
+    }
+
+    //$('a.fusMyCourseDocuments').attr('href','#').fuuiClient({
+    //    title: 'Course Documents',
+    //    fusUrl: '../Service/FileUploadServiceBrowse.aspx' + '?rc=' + (new Date()).getTime()
+    //});
+
+    $('a.fusMyCourseDocuments').attr('href', '#').on("click",function(e) {
+        e.preventDefault();
+
+        fuuiClient.launch({
+            title: 'Course Documents',
+            url: '../Service/FileUploadServiceBrowse.aspx' + '?rc=' + (new Date()).getTime(),
+            iframeTitle: 'Course Documents' //recommended attribute added for accessibility
+        });
+    });
+
+}
+
+// Make sure the first li does not show the separator in ul
+function HideToolbarFirstItemBorder(toolbarID) {
+    var firstEl = $('#' + toolbarID + ' li:first');
+    if (firstEl) {
+        var attrs = firstEl.attr('class');
+        if (attrs && attrs.indexOf('noborder') < 0)
+            firstEl.attr('class', (attrs + " noborder"));
+    }
+}
+
+function backOrClose() {
+    if (history.length > 0) {
+        history.back()
+        // JR - if it doesn't go back in 200 ms then it is likely that its at the first page 
+        //    in the history at which we want to close the window.
+        setTimeout("window.close()", 300);
+    }
+    else
+        window.close();
+}
+
+// REQUIRES JQUERY
+function doJsonError(xhr) {
+    if (typeof (xhr) == 'undefined' || xhr == null || xhr.responseText == "") {
+        alert("An unexpected error has occurred.");
+        return false;
+    }
+
+    var error = JSON.parse(xhr.responseText);
+    if (error == null || typeof(error.guid) == 'undefined' || error.guid == null || error.guid == '') {
+        alert('An unexpected error has occurred. Error contents, if available: [' + xhr.responseText + ']');
+        return false;
+    }
+
+    location = BaseUrl + "CustomErrors/Error.aspx?uid=" + error.guid + "&timestamp=" + error.timeStamp;
+}
+
+
+
+function navToStudyPlanPlayer(chapterId, sectionId, objectiveId, usesPlayerPopup, single, closeUrl, extraParams) {
+    var params = "chapterId=" + chapterId + "&sId=" + sectionId;
+
+    if (objectiveId > 0)
+       params = params + "&objectiveId=" + objectiveId;
+
+    if (single != undefined) {
+        params = params + "&single=" + single;
+    }
+
+    if (closeUrl)
+        params = params += "&closeUrl=" + escape(closeUrl);
+
+    if (extraParams)
+        params = params + "&" + extraParams;
+
+    if (usesPlayerPopup)
+        popupWindow("player", "PlayerPractice.aspx?" + params, { Width: 995, Height: 750, BringToFront: true, Statusbar: false, Scrollbar: false });
+    else
+        location = "PlayerPractice.aspx?" + params;
+}
+
+function closePopupAndGoTo(usesPlayerPopup,url) {
+    if (usesPlayerPopup && window.opener) {
+        window.opener.location = url;
+        window.close();
+    }
+    location = url;
+}
+
+// Remove 
+function removeEmptyElementsFromArray(arr) {
+    var newArray = new Array();
+
+    if (arr)
+        newArray = arr.filter(function (n) { return n !== "" });
+    return newArray;
+}
+
+if (typeof (dontAddArrayPrototypes) == "undefined" || !dontAddArrayPrototypes) {
+
+    // Added to replace the calls in old array.js, other methods exist in the array object already. - EC
+    //
+    // Array Remove - By John Resig (MIT Licensed)
+    Array.prototype.remove = function (from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+
+    Array.prototype.exists = function (value) {
+
+        if (jQuery) {
+            return $.inArray(value, this) > -1;
+        } else {
+            return this.indexOf(value) > -1;
+        }
+    };
+
+    Array.prototype.copy = function () {
+        return this.slice(0);
+    };
+
+}
+
+// Workaround for constructor.name is undefined in Internet Explorer
+function getFnName(fn) {
+    var f = typeof fn == 'function';
+    var s = f && ((fn.name && ['', fn.name]) || fn.toString().match(/function ([^\(]+)/));
+    return (!f && 'not a function') || (s && s[1] || 'anonymous');
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+/*
+* Sets a Cookie with the given name and value.
+*
+* name       Name of the cookie
+* value      Value of the cookie
+* [expires]  # of days for cookie
+* [path]     Path where the cookie is valid (default: path of calling document)
+* [domain]   Domain where the cookie is valid
+*              (default: domain of calling document)
+* [secure]   Boolean value indicating if the cookie transmission requires a
+*              secure transmission
+*/
+function setCookie(name, value, expires, path, domain, secure) {
+    if (expires) {
+        var date = new Date();
+        date.setTime(date.getTime() + (expires * 24 * 60 * 60 * 1000));
+        expires = date;
+    }
+    document.cookie = name + "=" + escape(value) +
+        ((expires) ? "; expires=" + expires.toGMTString() : "") +
+        ((path) ? "; path=" + path : "") +
+        ((domain) ? "; domain=" + domain : "") +
+        ((secure) ? "; secure" : "");
+}
+
+/*
+* XL-12127
+* Sets a Cookie with the given name and value.
+*
+* name       Name of the cookie
+* value      Value of the cookie
+* [expires]  # of days for cookie
+* [path]     Path where the cookie is valid (default: path of calling document)
+* [domain]   Domain where the cookie is valid
+*              (default: domain of calling document)
+* [secure]   Boolean value indicating if the cookie transmission requires a
+*              secure transmission
+*/
+function setCookieWithAdditionalParam(name, value, expires, path, domain, secure) {
+    if (expires) {
+        var date = new Date();
+        date.setTime(date.getTime() + (expires * 24 * 60 * 60 * 1000));
+        expires = date;
+    }
+
+    document.cookie = name + "=" + value +
+        ((expires) ? "; expires=" + expires.toGMTString() : "") +
+        ((path) ? "; path=" + path : "") +
+        ((domain) ? "; domain=" + domain : "") +
+        ((secure) ? "; secure" : "");
+}
+
+/**
+ * Deletes the specified cookie.
+ *
+ * name      name of the cookie
+ * [path]    path of the cookie (must be same as path used to create cookie)
+ * [domain]  domain of the cookie (must be same as domain used to create cookie)
+ */
+function deleteCookie(name, path, domain) {
+    if (getCookie(name)) {
+        document.cookie = name + "=" +
+            ((path) ? "; path=" + path : "") +
+            ((domain) ? "; domain=" + domain : "") +
+            "; expires=Thu, 01-Jan-70 00:00:01 GMT";
+    }
+}
+
+function unloadRequestNew(url, async) {
+
+    if (url.indexOf("?") > -1)
+        url = url + "&r=" + parseInt(Math.random() * 99999999);
+    else
+        url = url + "?r=" + parseInt(Math.random() * 99999999);
+
+    navigator.sendBeacon(url, null);
+}
+
+var numConfirmDialogs = 0;
+
+function isFoundationsFamily() {
+    if (typeof myNavParams === 'undefined' || myNavParams === null) {
+        return false;
+    }
+
+    if (myNavParams && myNavParams.isMyFoundations)
+        return true;
+    return false;
+}
+function confirmX(callback, bodyText, okButtonText, cancelButtonText) {
+    confirmFull(callback, SubAllowSubmit, bodyText, okButtonText, cancelButtonText);
+}
+
+function confirmFull(callback, cancelCallback, bodyText, okButtonText, cancelButtonText) {
+    var cancelButtonText = cancelButtonText ? cancelButtonText : LOCNS.LocMap.GetRes("resources", "Cancel");
+    var okButtonText = okButtonText ? okButtonText : LOCNS.LocMap.GetRes("resources", "OK");
+    var bs = isFoundationsFamily() ? "xlbootstrap" : "xlbootstrap3";
+
+    var confirmModal =
+        $('<div class="' + bs + '" tabindex="-1"><div class="modal" role="dialog" aria-modal="true" aria-describedby="modalBody' + numConfirmDialogs + '" style="display: block;z-index: 10000000 !important; ">' +
+            '<div class="modal-dialog" role="document">' +
+            '<div class="modal-content">' +
+            '<div class="modal-body" id="modalBody' + numConfirmDialogs + '">' +
+            '<p style="max-height: calc(100vh - 200px);overflow: auto;">' + bodyText.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>") + '</p>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+            '<a href="#!" id="cancelButton' + numConfirmDialogs + '" class="btn" data-dismiss="modal">' + cancelButtonText + '</a>' +
+            '<a href="#!" id="okButton' + numConfirmDialogs + '" class="btn btn-primary">' + okButtonText + '</a>' +
+            '</div></div></div></div></div>');
+
+    confirmModal.find('#okButton' + numConfirmDialogs).on("click",function (event) {
+        if (typeof callback === "function") {
+            callback();
+        }
+        confirmModal.modal('hide');
+    });
+
+    confirmModal.find('#cancelButton' + numConfirmDialogs).on("click",function (event) {      
+        if (typeof cancelCallback === "function") {
+            cancelCallback();
+        }
+        confirmModal.modal('hide');       
+    });
+
+    confirmModal.modal({
+        backdrop: 'static',
+        show: true,
+    });
+    $('#okButton' + numConfirmDialogs).focus();
+    numConfirmDialogs++;
+}
+
+
+function alertX(bodyText, callback) {
+    var okButtonText = okButtonText ? okButtonText : LOCNS.LocMap.GetRes("resources", "OK");
+    var bs = isFoundationsFamily() ? "xlbootstrap" : "xlbootstrap3";
+
+    var confirmModal =
+        $('<div class="' + bs + '" tabindex="-1"><div class="modal" tabindex="-1" role="dialog" aria-modal="true" aria-describedby="modalBody' + numConfirmDialogs + '" style="display: block;" data-backdrop="static">' +
+            '<div class="modal-dialog" role="document">' +
+            '<div class="modal-content">' +
+            '<div class="modal-body" id="modalBody' + numConfirmDialogs + '">' +
+            '<p>' + bodyText.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>") + '</p>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+            '<a href="#!" id="okButton' + numConfirmDialogs + '" class="btn btn-primary">' + okButtonText + '</a>' +
+            '</div></div></div></div></div>');
+
+    confirmModal.find('#okButton' + numConfirmDialogs).on("click",function (event) {
+        if (typeof callback === "function") {
+            callback();
+        }
+        confirmModal.modal('hide');
+        if (document.getElementById("dropdownMenuButton") == null)
+        {
+            var textAreaEl = document.getElementById("textareaTinyMce");
+            if (textAreaEl)
+                textAreaEl.focus();
+        }
+        else
+        {
+            var dropdownEl = document.getElementById("dropdownMenuButton");
+            if (dropdownEl)
+                dropdownEl.focus();
+        }
+    });
+
+
+    confirmModal.modal({
+        backdrop: 'static',
+        show: true,
+    });
+    $('#okButton' + numConfirmDialogs).focus();
+    numConfirmDialogs++;
+    }
+function alert(message) {
+    alertX(message);
+}
+
+function isXFrame() {
+    try {
+        if (window.location.host === top.location.host)
+            return false;
+    }
+    catch {
+    }
+    return true;
+}
+
+function getGradeCategory(strGradeCategory) {
+    if (!strGradeCategory)
+        return -1;
+
+    var s = strGradeCategory.toLowerCase();
+
+    switch (s) {
+        case "homework":
+            return 2; // GradeCategoryType.Homework
+        case "quizzes":
+        case "quiz":
+            return 4; // GradeCategoryType.Quiz;
+        case "quizme":
+            return 12; //GradeCategoryType.QuizMe;
+        case "tests":
+        case "test":
+            return 1; //GradeCategoryType.Test;
+        case "other":
+        case "external":
+            return 3; // GradeCategoryType.External;
+        case "practice set":
+        case "practice sets":
+        case "practiceset":
+        case "practicesets":
+            return 8; // GradeCategoryType.PracticeSet;
+        case "activityrld":
+        case "activity rld":
+        case "diagnostic":
+        case "diagnostics":
+            return 10; // GradeCategoryType.ActivityRLD;
+        case "activityrle":
+        case "activity rle":
+        case "exercise":
+        case "exercises":
+            return 11; // GradeCategoryType.ActivityRLE;
+        default:
+            return -1; // GradeCategoryType.Undefined;
+    }
+}
+;
+//Public settings.  If necessary you can changes this on the page.
+var PopupUseTop    = false;
+var PopupDefWidth  = 800;
+var PopupDefHeight = 600;
+var PopupTimeout = 5550;
+
+//Private variables
+var popupWindows = new Array();
+var popupEventAdded = false;
+var popupAutoClose = new Array();
+var popupWinUrls = new Array();
+
+//Add basePath for MAC bug.  Basically, get the path from current page 
+//and use it to refernce popup window html
+var basePopupPath;
+
+
+//First check for a ? in the path and get rid of it and everything to the right
+var queryidx = location.href.indexOf("?")
+var hashidx = location.href.indexOf("#");
+
+var idx = -1;
+if (queryidx < 0) {
+    if (hashidx < 0) {
+        idx = -1;
+    } else {
+        idx = hashidx;
+    }
+} else {
+    if (hashidx < 0) {
+        idx = queryidx;
+    } else if (queryidx < hashidx) {
+        idx = queryidx;
+    } else {
+        idx = hashidx;
+    }
+}
+
+if (idx < 0) {
+    basePopupPath = location.href;
+} else {
+    basePopupPath = location.href.substring(0, idx);
+}
+
+//Now truncate up to last slash
+basePopupPath = basePopupPath.substring(0, basePopupPath.lastIndexOf("/") + 1)
+
+/* Function - popupWindow(winName,winUrl,options)
+
+   Parameters
+    
+     winName    - Unique name for this popup.  Windows will be internally tracked by winName
+                  and reused when the names match.
+                  
+     winUrl     - Url for page to load in popup.
+     
+     options    - A set of option for controlling the popup.  See examples below for usage.
+
+       options.Scrollbar   - Determines if scrollbar is shown or not.  Default = true;
+       options.Titlebar    - Determines if titlebar is shown or not.  Default = false;
+       options.Statusbar   - Determines if statusbar is shown or not.  Default = true;
+       options.Width       - Width of window.  Default = PopupDefWidth;
+       options.Height      - Height of window. Default = PopupDefHeight;
+       options.Left        - Left position of window. This is a pixel location, but if not set will default to centered (-1) if width is specified.
+       options.Top         - Top position of window.  This is a pixel location, but if not set will default to centered (-1) if height is specified.
+       options.AutoClose   - This will determine if window will close automatically when the page is unloaded.  The default is true.
+       options.Resizable  - This will determine if the window is resizable.  Default is true.
+       options.BringToFront - If this option is set to true and the window already exists with the same url it will not refresh and
+                              just be brought to the front.  Default is false.
+       options.Toolbar      - This will display the toolbar.  Default = false
+       options.Location     - This will display the location bar.  Default = false
+       options.Menubar      - CA Determines presence of the menu bar. Default = false. 
+       options.NaturalSize  - Determines if we should allow browser to size of the window. Default = false.
+       
+       options.Directories - Whether or not to add directory buttons. Default = true. IE only
+       
+  Returns
+    
+      A pointer to the popup window created or referred to by winName.
+       
+  Examples 
+  
+      popupWindow("Video",url)  //This takes all the default options
+      
+      popupWindow("Explore",url,{AutoClose:false,Resizable:false}) 
+      
+      popupWindow("XYZ",url,{Scrollbar:false,Top:0,Left:0})
+   
+*/
+function popupPopover(winName, winUrl, options) {
+    //Check for Jquery.  If not there jsut use popupWindow
+    if (typeof jQuery != "undefined" && typeof jQuery.ui != "undefined" && typeof jQuery.ui.dialog != "undefined") {
+        return popupWindow(winName, winUrl, $.extend(options, { UsePopover: true }));
+    } else {
+        alert("Jquery, Jquery UI and Jquery UI Dialog need to be present in order to use this feature.");
+        return popupWindow(winName, winUrl, options);
+    }
+}
+
+function popupWindow(winName, winUrl, options, showAlertX) {
+
+  //Set up defaults
+  //CED : Add toolbar and location
+  var scrollbar  = true;
+  var toolbar    = false;
+  var location   = false;
+  var titlebar   = false;
+  var statusbar  = false;  
+  var width      = PopupDefWidth;
+  var height     = 0;
+  var left       = -1;
+  var top        = -1;
+  var autoclose  = true;
+  var resizable = true;
+  var autoHeight = false;
+  var bringToFront = false;
+  var menubar = false;
+  var directories = true;
+  var usePopover = false;
+  var naturalSize = false;
+  
+  var win;
+  
+  //CED : Add toolbar and location
+  if (typeof(options) != "undefined") {
+    if (typeof(options.Toolbar) != "undefined") toolbar = options.Toolbar;
+    if (typeof(options.Location) != "undefined") location = options.Location;
+    if (typeof(options.Scrollbar) != "undefined") scrollbar = options.Scrollbar;
+    if (typeof(options.Titlebar)  != "undefined") titlebar = options.Titlebar;    
+    if (typeof(options.Statusbar) != "undefined") statusbar = options.Statusbar;        
+    if (typeof(options.Width)     != "undefined") width =  options.Width;
+    if (typeof(options.Height)    != "undefined") height = options.Height;
+    if (typeof(options.Left)      != "undefined") left = options.Left;
+    if (typeof(options.Top)       != "undefined") top = options.Top;
+    if (typeof(options.AutoClose) != "undefined") autoclose = options.AutoClose;
+    if (typeof (options.Resizable) != "undefined") resizable = options.Resizable;
+    if (typeof (options.BringToFront) != "undefined") bringToFront = options.BringToFront;
+    if (typeof (options.Menubar) != "undefined") menubar = options.Menubar;
+    if (typeof (options.Directories) != "undefined") directories = options.Directories;
+    if (typeof (options.UsePopover) != "undefined") usePopover = options.UsePopover;
+    if (typeof (options.NaturalSize) != "undefined") naturalSize = options.NaturalSize;
+  }
+
+if (!naturalSize) {
+
+  if (height == 0) {
+    autoHeight = true;
+    height = PopupDefHeight;
+  }
+
+  var HeightBuffer = 35;
+  var WidthBuffer = 10;
+
+  // Comment 6994
+  // Betsy's PC is not including her taskbar height and then covering the taskbar
+  // I could only repeat this by setting taskbar to not auto-hide and not always on top  
+  // Only do this nudge when task bar is not accounted for in availHeight
+  if (!autoHeight && ( (screen.availHeight == screen.height) || (screen.availHeight-height<HeightBuffer) ))
+  {
+    if (screen.availHeight<height)
+    {
+      top = 0;
+      height = screen.availHeight - (HeightBuffer*3);
+    }
+    else if (screen.availHeight-height<HeightBuffer)
+    {
+      top = 0;
+      height -= (HeightBuffer*2);
+    }
+  }
+
+  //if (!autoHeight && (screen.availWidth-width<WidthBuffer))
+  //In an attempt to fix comment 8118 we decided to limit the width
+  //of all popups to the availWidth.  This code was already here 
+  //excpet it was not doing it if autoHeight was true.  I'm removing that
+  //since I'm not sure why it's there in the first place.  MAD 11/21/06
+  if ((screen.availWidth-width)<WidthBuffer)
+  {
+    left = 0;
+    width = screen.availWidth - WidthBuffer;
+    
+  }
+}
+  
+  //Build options string using an array  
+  //CED : change yes and no to 1 and 0 for firefox
+  //CED : Add toolbar and location
+var opts = new Array();
+  if (scrollbar) opts.push("scrollbars=1");
+  if (toolbar) opts.push("toolbar=1");
+  if (location)
+      opts.push("location=1");
+  else
+      opts.push("location=0");
+  if (statusbar) 
+     opts.push("status=1");  
+  else
+     opts.push("status=0");
+  if (titlebar) opts.push("titlebar=1");
+  if (menubar) opts.push("menubar=1");
+  if (resizable) opts.push("resizable=1");
+  else opts.push("resizable=0");
+  if (!directories) opts.push("directories=0");     // CA Default = true so no need to pass in parameter if true
+if (!naturalSize) {
+  opts.push("height=" + height);
+  opts.push("width="+width);
+  if (left < 0) left = (screen.availWidth - width)/2;
+  if (top  < 0) top  = (screen.availHeight -height)/2;
+  opts.push("left="+left);
+  opts.push("top=" + top);
+}
+  var optsstr = opts.join(",");
+
+  //Popup window and bring it to the front.
+  var winMain;
+  
+  if (PopupUseTop) {
+      winMain = top.window;
+  } else {
+    winMain = window;
+  }
+
+  var isAbsoluteUrl = false;
+  if (winUrl.indexOf('http') == 0)
+      isAbsoluteUrl = true;
+  
+  //This doesn't seem right and is messing up absolute URLs.
+  //if ((winUrl.charAt(0) != "/") && (winUrl.search(/http%3A/) != -1))
+  // CA If url is empty, it means no url is desired; designed for popups whose content is filled in dynamically.
+
+  if (winUrl != '') {
+      if ((winUrl.charAt(0) != "/") && !isAbsoluteUrl) {
+          winUrl = basePopupPath + winUrl;
+      }
+
+
+      //I moved these lines of code that manipulate winUrl, this way when we compare again cached version, it will be the same.
+      if (!isAbsoluteUrl && autoHeight) {
+          winUrl = popups_replaceParam(winUrl, "autoh", "yes");
+      } else {
+          winUrl = popups_removeParam(winUrl, "autoh");
+      }
+
+      if (!isAbsoluteUrl && (left >= 0 || top >= 0)) {
+          winUrl = popups_replaceParam(winUrl, "centerwin", "yes");
+      } else {
+          winUrl = popups_removeParam(winUrl, "centerwin");
+      }
+
+      if (usePopover)
+          winUrl = popups_replaceParam(winUrl, "popover", "yes");
+  }
+
+  if (bringToFront) {
+    win = getPopup(winName);
+    if (win) {
+      var wUrl = popupWinUrls[winName];
+      if (wUrl && wUrl == winUrl) {
+        win.focus();
+        return win;
+      }
+    }
+  }
+
+  //Close PopupWindow if it already exists
+    closePopup(winName);
+
+    if (usePopover) {
+        options = $.extend(options, {
+            Height: autoHeight?null:height,
+            Width: width,
+            Left: left,
+            Top: top,
+            AutoHeight:autoHeight,
+            Resizable:resizable
+        });
+        win = openPopover(winUrl, winName, options);
+    } else {
+        win = winMain.open(winUrl, winName, optsstr);
+        setTimeout(function () {
+            try {
+                if (!win || typeof win === 'undefined') {
+                    // Close the window that is hidden behind Chrome's popup blocker
+                    // This is useful because you can then reclaim the name of the window that is being hidden
+                    // Without this, window.open(..., name_of_popup, ...) will be blocked because it is currently hidden by Chrome
+                    if (win)
+                        win.close();
+
+                    popupWindows[winName] = null;
+                    popupAutoClose[winName] = false;
+                    popupWinUrls[winName] = null;
+                    var text = LOCNS.LocMap.GetRes("common/popups_1.js", "PopupBlockedWarning");
+                    if (typeof jQuery != "undefined" && typeof jQuery.ui != "undefined" && typeof jQuery.ui.dialog != "undefined") {
+                        var dialog = $("<div></div>").append(text.replace("\n", "<br/>")).appendTo("body");
+
+                        dialog.dialog({
+                            autoOpen: true,
+                            modal: true,
+                            width: "auto",
+                            height: "auto",
+                            dialogClass: "popover",
+                            resizable: false,
+                            draggable: false,
+                            closeOnEscape: true
+                        });
+                    } else {
+                        //to handle the ok button of the alert for the angular pages(if we open the popupwindow from aspx pages having angular component)
+                        if (typeof (showAlertX) == "undefined") {
+                            alert(text);
+                        } else {
+                            alertX(text, function () { bindPage(getCurrentPageUrl()); });
+                        }
+                    }
+                } 
+            } catch (ex) {
+            }
+        }, 500);
+    }
+        
+  //Add to global list
+  popupWindows[winName] = win;
+  popupAutoClose[winName] = autoclose;
+
+  //If this is a blocked popup, then don't remember the url. This way bringToFront won't be tried next time.
+  var blocked = options.blocked || false;
+  if (!blocked) {
+      popupWinUrls[winName] = winUrl;
+  }
+
+    //Bring to front.  
+  if (win) {
+      win.focus();
+  }
+  
+  if (autoclose && ! popupEventAdded) {
+    if(winMain.attachEvent) { 
+      winMain.attachEvent("onunload",PopupMainWindowUnloaded); 
+    } else if(winMain.addEventListener) { 
+      winMain.addEventListener("unload",PopupMainWindowUnloaded, false); 
+    }
+  }
+  
+  return win;
+
+}
+
+function getCurrentPageUrl() {
+    return encodeURIComponent(window.pageUrl + window.location.search);
+}
+
+function bindPage(url) {
+    var count = (numConfirmDialogs - 1);
+    document.getElementById("okButton" + count).setAttribute("href", decodeURIComponent(url) + '#!');
+}
+
+function postForm(winName, winUrl, postParams) {
+    var form = document.createElement("form");
+    form.action = winUrl;
+    form.method = "POST";
+    form.target = winName;
+    
+    var data = postParams;
+    if (data) {
+        for (var key in data) {
+            var input = document.createElement("input");
+            input.name = key;
+            input.type = "hidden";
+            input.value = typeof data[key] === "object" ? JSON.stringify(data[key]) : data[key];
+            form.appendChild(input);
+        }
+    }
+    form.style.display = 'none';
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function postWindow(winName, winUrl, postParams, options) {
+    var popup = popupWindow(winName, "", options);
+    postForm(winName, winUrl, postParams);
+    return popup;
+}
+
+function getHeight(poppedWindow) {
+    var myHeight = 0;
+    if (typeof (poppedWindow.innerWidth) == 'number') {
+        //Non-IE
+        myHeight = poppedWindow.innerHeight;
+    } else if (poppedWindow.document.documentElement && (poppedWindow.document.documentElement.clientHeight)) {
+        //IE 6+ in 'standards compliant mode'
+        myHeight = poppedWindow.document.documentElement.clientHeight;
+    } else if (poppedWindow.document.body && (poppedWindow.document.body.clientHeight)) {
+        //IE 4 compatible
+        myHeight = poppedWindow.document.body.clientHeight;
+    }
+    return myHeight;
+}
+
+function _hasPopupBlocker(poppedWindow) {
+    var result = false;
+    try {
+        if (typeof poppedWindow == 'undefined') {
+            // Safari with popup blocker... leaves the popup window handle undefined
+            result = true;
+        }
+        else if (poppedWindow && poppedWindow.closed) {
+            // This happens if the user opens and closes the client window...
+            // Confusing because the handle is still available, but it's in a "closed" state.
+            // We're not saying that the window is not being blocked, we're just saying
+            // that the window has been closed before the test could be run.
+            result = false;
+        }
+        else if (poppedWindow && getHeight(poppedWindow) > 0) {
+            // This is the actual test. The client window should be fine.
+            result = false;
+        }
+        else {
+            // Else we'll assume the window is not OK
+            result = true;
+        }
+
+    } catch (err) {
+        result = true;
+    }
+
+    if (result) {
+        alert("You seem to have a popup blocker installed.  Please disable it for this site.");
+    }
+}
+
+function PopupMainWindowUnloaded() {
+  for (var winName in popupWindows) {
+    var win = popupWindows[winName];
+    if (win && typeof(win) == "object" && ! win.closed && popupAutoClose[winName]) {
+      popupWindows[winName] = null;
+      popupAutoClose[winName] = false;
+      popupWinUrls[winName] = null;
+      if (win.close)
+        win.close();
+    }
+  }
+}
+
+function getPopup(winVar) {
+  if (typeof(winVar) == "string") {
+    winVar = popupWindows[winVar];
+  }
+  if (winVar && ! winVar.closed) {
+   return winVar;
+  } else {
+    return null;
+  }
+}
+
+//closePopup can be called with a name of window reference.
+function closePopup(winVar)
+{
+    if (typeof (winVar) == "string") {
+        winVar = popupWindows[winVar];
+    }
+
+    try {
+        if (winVar && !winVar.closed && winVar.close)
+            winVar.close();
+    } catch (ex) {
+        //This might by needed to avoid some error, for sonar please igonore for now.
+        console.log(ex);
+    }
+}
+
+function focusPopup(winVar) {
+  if (typeof(winVar) == "string") {
+    winVar = popupWindows[winVar];
+  }
+  if (winVar && ! winVar.closed)
+   winVar.focus();
+}
+
+
+// Remove parameter from reqstr
+function popups_removeParam(reqstr,param)
+{
+	var evstr, dest;
+	dest = new String(reqstr); 
+
+	  
+	//The eval below would not work if the js was minified.
+	var regexp = new RegExp("[\\?|\\&]" + param + "=(([^\\&]*)|\s*$)", "gi");
+	dest = dest.replace(regexp, "");
+	
+
+	// if we stripped out the first param, make the following param have the ampersand
+    if (dest.indexOf("?") == -1 && dest.indexOf("&") != -1) {
+        dest = dest.replace(/\&/, "?");
+    }
+
+  return dest;
+}
+
+
+// If parameter exists in reqstr, change its value
+// If not, add it
+function popups_replaceParam(reqstr,param,value)
+{
+  var evstr, dest;
+  dest = new String(reqstr); 
+
+  // strip out existing parameter
+  dest = popups_removeParam(dest,param)
+
+  if (dest.indexOf("?")>=0)
+    dest=dest+"&"+param+"="+value;
+  else
+    dest=dest+"?"+param+"="+value;
+
+  return dest;
+}
+
+// CA Obtains the collection of popup windows (e.g., for name or popup traversal)
+function getPopupWindows() {
+    return popupWindows;
+}
+
+
+function openerHasFunction(functionName) {
+    try {
+        if (window.opener && eval("window.opener." + functionName))
+            return true;
+    } catch (e) {
+    }
+    return false;
+}
+
+/**
+ * This is just a start of a openPopover function that works in place of openPopup.
+ * I only implemented the features I needed for the PreReqWarning display.
+ * At some point we can extend this to handle other features
+ */
+function openPopover(winUrl, winName, options) {
+
+    function cleanupWindow() {
+        popupWindows[winName] = null;
+        popupAutoClose[winName] = false;
+        popupWinUrls[winName] = null;
+    }
+
+    var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>');
+    var dialog = $("<div></div>").append(iframe).appendTo("body");
+    var dlg = dialog.dialog({
+        autoOpen: false,
+        modal: false,
+        width: "auto",
+        height: "auto",
+        dialogClass: "popover",
+        resizable: options.Resizable,
+        draggable: true,
+        closeOnEscape: true,
+        close: function () {
+            iframe.attr("src", "");
+            $(this).dialog('destroy').remove();
+            cleanupWindow();
+        },
+        resize: function (evt, ui) {
+            var content = iframe.parent();
+            iframe.width(content.innerWidth());
+            iframe.height(content.innerHeight());
+        }
+    });
+            
+    if (options.AutoHeight) {
+        iframe.resize(function () {
+           
+        });
+    }
+
+    //Overload window.close inside frame element to simulate a window.  THis way existing code
+    //that calls window.close() will close the popover.
+    //Also Overload window.opener to this window.
+    iframe.one("load",function () {
+
+        dialog.dialog("option","title",this.contentDocument.title);
+
+        var closeFunc = function () {
+            dialog.dialog("close");
+            cleanupWindow();
+        }
+
+        this.contentWindow.close = closeFunc;
+        this.contentWindow.closePopover = closeFunc; //Needed this for IE.
+        this.contentWindow.opener = window;
+    });
+
+
+    var src = winUrl;
+    
+    iframe.attr({
+        width: options.Width,
+        height: options.Height,
+        src: src
+    });
+        
+    dialog.dialog("open");
+
+    return iframe[0];
+}
+
+;
+var LeftNavStateUpdate = {
+    DEFAULT_TIMEOUT: 7000,      // CA timeout in ms
+    navXmlHttp: null,
+    postStateUpdateUrl: null,
+    onNavCallbackFunction: null,
+    navUrl: null,
+    connectionErrorText: null,
+    navXmlHttpTimeout: null,
+
+    init: function (navUrl, connectionErrorText) {  // CA Note: connectionErrorText not currently being used; errors are currently being ignored, i.e., the Left Nav State Cookie will be updated on a best-effort basis.
+        this.navUrl = navUrl;
+        this.connectionErrorText = connectionErrorText;
+    },
+
+    doNavCallbackHandler: function () {
+        if (LeftNavStateUpdate.navXmlHttp.readyState == 4)  // CA 4 = Completed
+        {
+            clearTimeout(LeftNavStateUpdate.navXmlHttpTimeout);
+
+            var result = LeftNavStateUpdate.navXmlHttp.responseText;
+            if (result != 'OK')
+                LeftNavStateUpdate.doNavCallbackError(this.connectionErrorText);
+
+            if (LeftNavStateUpdate.onNavCallbackFunction != null)
+                LeftNavStateUpdate.onNavCallbackFunction();
+
+            if (LeftNavStateUpdate.postStateUpdateUrl != null)
+                location = LeftNavStateUpdate.postStateUpdateUrl;
+        }
+    },
+
+    doNavCallback: function (flag, onNavCallbackFunction, postStateUpdateUrl) {
+
+        this.postStateUpdateUrl = (typeof (postStateUpdateUrl) != "undefined") ? postStateUpdateUrl : null;
+        this.onNavCallbackFunction = (typeof (onNavCallbackFunction) != "undefined") ? onNavCallbackFunction : null;
+
+        if (window.XMLHttpRequest) {
+            this.navXmlHttp = new XMLHttpRequest();
+        } else {
+            this.navXmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        if (this.navXmlHttp == null) {
+            alert("Your browser doesn't support AJAX.");
+            return false;
+        }
+
+        if (this.navXmlHttp != null) {
+
+            var seed = parseInt(Math.random() * 99999999);
+            this.navXmlHttp.open("GET", this.navUrl + "?arg=" + flag + "&r=" + seed, true);
+            this.navXmlHttp.onreadystatechange = LeftNavStateUpdate.doNavCallbackHandler;
+            this.navXmlHttp.send();
+            LeftNavStateUpdate.navXmlHttpTimeout = setTimeout(LeftNavStateUpdate.navTimeoutHandler, this.DEFAULT_TIMEOUT);
+        }
+        else
+            alert('AJAX not supported');
+
+    },
+
+    doNavCallbackError: function (s) {
+        //alert(s);
+        return true;        // CA Simply continue on error. Let the user navigate. 
+    },
+
+    navTimeoutHandler: function () {
+        // CA For a timeout, treat it like an error; simply allow the user to continue.
+        if (LeftNavStateUpdate.onNavCallbackFunction != null)
+            LeftNavStateUpdate.onNavCallbackFunction();
+    }
+
+
+}
+;

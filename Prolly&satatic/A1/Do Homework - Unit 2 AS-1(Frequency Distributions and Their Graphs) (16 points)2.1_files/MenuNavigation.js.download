@@ -1,0 +1,498 @@
+﻿var flagNavInitialization = !0;
+
+    function defaultMaster() {
+        var showBanner = myNavParams.showBanner;
+        var showLeftNavigation = myNavParams.showLeftNavigation;
+        var leftNavState = myNavParams.leftNavState;
+
+        if (myNavParams.supportNewNavigation) {
+            if (showBanner && showLeftNavigation) {
+                showTopBanner(true);
+            }
+            else if (showBanner && !showLeftNavigation) {
+                showTopBanner(true);
+                $('#mainLeftNavContainer').hide();
+                $("#mainBodyContainer").addClass("no-left-nav");
+                $('#dvHamBurger').hide();
+            }
+            else if (!showBanner && showLeftNavigation) {
+                showTopBanner(true);
+                $('#mainBodyContainer').css('margin-left', '255px');
+                $('#mainLeftNavContainer').show();
+                $('#dvHamBurger').show();
+                $('#toggleRightMenu').hide();
+                $('#main-body-container').css('padding-top', '0');
+            } else {
+                $('#mainLeftNavContainer').hide();
+                showTopBanner(false);
+                $('body').addClass('no-top-nav');
+                $("#mainBodyContainer").addClass("no-left-top-nav");
+            }
+        } else {
+            //showBanner hide or display the top navigation
+            if (!showBanner) {
+                $('#mainTopNavContainer').hide();
+                $('#dvMainRow').addClass('main-row-integration');
+                $('#main-body-container').css('padding-top', '0');
+
+            } else {
+                $('#mainTopNavContainer').show();
+                $('#dvMainRow').removeClass('main-row-integration');
+            }
+        }
+        
+        //showLeft navigation show or hide the left navigation all the time
+        if (showLeftNavigation) {
+            //leftNavState current state of left nav display
+            if (leftNavState === 'False') {
+                expand();
+            } else {
+                fncollapse();
+            }
+        } else {
+            $('#mainLeftNavContainer').hide();
+            $('#mainBtnExpand').hide();
+            $('#mainBtnCollapse').hide();
+            $('#mainBodyContainer').removeClass('col-xs-10').addClass('col-xs-12');
+            $('#mainBodyContainer').css('margin-left', '0px');
+
+        }
+
+        success(navigationData);
+    }
+
+    function showTopBanner(boolFlag) {
+        $('#mainTopNavContainer').toggle(boolFlag);
+
+        $('body').css("padding-top", boolFlag && !myNavParams.isMyFoundations ? "54px" : "0");
+        if (!boolFlag) {
+            $('body').css("margin-left", "5px");
+            $('body').css("margin-right", "5px");
+            $('body').css("margin-top", "5px");
+        }
+    }
+
+    function topNavMaster() {
+
+        var showBanner = myNavParams.showBanner;
+        if (showBanner) {
+            $('#mainTopNavContainer').show();
+            //add padding top for the top navigation
+            if (myNavParams.supportNewNavigation)
+                $('body').css("padding-top", "54px");
+
+            $('#dvMainRow').removeClass('main-row-integration');
+
+        } else {
+            $('#mainTopNavContainer').hide();
+            $('#dvMainRow').addClass('main-row-integration');
+        }
+
+        if (myNavParams.supportNewNavigation) 
+            {
+                toggleNav();
+            }
+            else
+            {
+                $('#btnExpand').click(toggleNav);
+            }
+        
+        success(navigationData);
+    }
+
+
+    function playerMaster() {
+
+        var showPlayerHeader = myNavParams.showPlayerHeader;
+        if (showPlayerHeader) {
+            showTopBanner(true);
+            $('#dvMainRow').removeClass('main-row-integration');
+
+        } else {
+            showTopBanner(false);
+            $('#main-body-container').addClass('main-row-integration');
+        }
+        success(navigationData);
+    }
+
+    function toggleNav() {
+        var n = $("#mainLeftNavContainer");
+        (!(n.length > 0)) ? fncollapse() : (n.is(":visible") ? fncollapse() : expand());
+    }
+
+  
+    function setLeftNavState(flag) {
+        var seed = parseInt(Math.random() * 99999999);
+        var navStateUpdateUrl = '/service/LeftNavStateUpdate.aspx?arg=' + flag + '&r=' + seed;
+        $.get(navStateUpdateUrl);
+    }
+    
+    function fncollapse() {
+        $("#mainLeftNavContainer").hide(), $("#mainBodyContainer").addClass("no-left-nav");
+
+        $('#buttonExpand').show();
+        $('#mainLeftNavContainer').hide();
+        var supportNewNav = myNavParams.supportNewNavigation;
+        var supportMobile = myNavParams.supportMobile;
+        if (!supportMobile) {
+            $('#mainBodyContainer').removeClass('col-xs-10');
+            $('#mainBodyContainer').addClass('col-xs-12');
+            $('#mainBodyContainer').css('margin-left', '0px');
+        }
+        if (!supportNewNav) {
+            var btnExpandScript = '<a id="btnExpand" href="#"style="margin-top:1px;margin-left:2px;margin-right:5px;float:left;"  onclick="toggleNav()" ><img src="/Common/btn_open_nav.png" title="' + myNavParams.showNavigationText + '" alt="' + myNavParams.showNavigationText + '" style="width:23px;"><span class="readableButHidden">' + myNavParams.showNavigationText + '</span></a>';
+        }
+        
+        
+        if ($('#dashboardContainer').is(':visible')) {
+            $('#dashboardExpand').html(btnExpandScript);
+        }
+       
+        else if ($('#PanelCourseName').is(':visible')) {
+            $('#btnExpandCourse').html(btnExpandScript);
+        }
+        else if ($('#btnExpandAnnouncements').length > 0) {
+            $('#btnExpandAnnouncements').html(btnExpandScript);
+        }
+        else if (typeof pnlGBBreadCrumbId !== 'undefined' && $('#' + pnlGBBreadCrumbId).is(':visible')) {
+            $('#btnExpandGradebookBreadcrumb').html(btnExpandScript);
+        } 
+        else if (typeof pnlBreadCrumbId !== 'undefined' && $('#' + pnlBreadCrumbId).is(':visible')) {
+            $('#btnExpandBreadcrumb').html(btnExpandScript);
+        } else {
+            $('#mainBtnExpand').html(btnExpandScript);
+        }
+
+        $("#btnHamBurger").text(myNavParams.showNavigationText);
+        $('body').css("background-color", "#fff");
+        if (!flagNavInitialization)
+            setLeftNavState(false);
+    }
+
+    function expand() {
+        $("#mainBodyContainer").css('margin-left', '');
+        $('#mainBtnCollapse').show();
+        $('#buttonExpand').hide();
+        $('#mainBtnExpand').html('');
+        $('#dashboardExpand').html('');
+        $('#btnExpandAnnouncements').html('');
+        $('#btnExpandCourse').html('');
+        $('#btnExpandGradebookBreadcrumb').html('');
+        $('#btnExpandBreadcrumb').html('');
+        $('#mainLeftNavContainer').show();
+        $("#mainBodyContainer").removeClass("no-left-nav");
+        var supportMobile = myNavParams.supportMobile;
+
+        if (!supportMobile) {
+            $('#mainBodyContainer').removeClass('col-xs-12');
+            $('#mainBodyContainer').addClass('col-xs-10');
+            $('#mainBodyContainer').css('margin-left', '');
+        }
+
+            $("#btnHamBurger").text(myNavParams.hideNavigationText);
+
+            if (!myNavParams.isMyFoundations)
+                $('body').css("background-color", "#F0F0F0" );
+        if (!flagNavInitialization)
+            setLeftNavState(true);
+    }
+
+    function success(data) {
+        buildLeftNav(data);
+        if (myNavParams.supportNewNavigation) {
+            buildLogoMobile(data);
+            buildMobileTopNav(data);
+        } else {
+            buildLogo(data);
+            buildTopNav(data);
+        }
+
+    }
+
+    function storeNavData(navKey) {
+        window.navigation_key = navKey;
+    }
+
+    function getStoredNavData() {
+        return navigation_key;
+    }
+
+    function buildLeftNav(data) {
+        var out = $("#mainLeftNav").html();
+        $.each(data.LeftNavigation, function (index, item) {
+            
+            out = out + '<div ';
+            if (item.Url === "#empty") {
+                out = out + 'class="menu-item-empty">';
+            }
+            else if (item.Key === getStoredNavData()) {
+                out = out + 'class = "menu-item-selected">';
+            }
+            else if (item.Url == null) {
+                out = out + 'class = "menu-subheader">';
+            } else
+                out = out + 'class="menu-item">';
+            
+            //adding data-role = none to avoid jquery mobile style
+            if (item.Url === "#empty") { //Adding this block for Accessibility (XL-10506)
+                out = out + '<a href="' + item.Url + '" data-role="none" class="navA" aria-hidden="true" tabindex="-1" title="" onclick=storeNavData("' + item.Key + '")';
+                out = out + '>' + item.Name + '</a>';
+            } else if (item.Url != null) {
+                out = out + '<a href="' + item.Url + '" data-role="none" class="navA" onclick=storeNavData("' + item.Key + '")';
+                if (item.Tooltip != null) {
+                    out = out + ' title="' + item.Tooltip + '"';
+                }
+                out = out + '>' + item.Name + '</a>';
+            } else {
+                out = out + '<span>' + item.Name + '</span>';
+            }
+            out = out + '</div>';
+        });
+        $('#mainLeftNav').html(out);
+    }
+
+    function buildLogo(data) {
+        var hasCustomBanner = myNavParams.hasCustomBanner;
+        var showBanner = myNavParams.showBanner;
+        var isCC = myNavParams.isCC;
+        
+
+        if (hasCustomBanner) {
+            $('#mainBandLogo').addClass("custom_banner_logo");
+            //banner logo custom class used in foundations
+            $('#mainBandLogo').addClass("banner_logo");
+        } else {
+            $('#mainBandLogo').addClass("improvedBanner_logo");
+        }
+        
+        if (showBanner) {
+            if (hasCustomBanner) {
+                $('#mainBandLogo').attr("src", "/images/spacer.gif");
+            } else {
+                $('#mainBandLogo').attr("src", data.ProductHeaderInfo.ImageUrl);
+                $('#mainBandLogo').attr("alt", data.ProductHeaderInfo.Name);
+            }
+        }
+        else if (currentMaster === 'playermaster' && (isCC)) {
+            $('#mainBandLogo').attr("src", "/images/spacer.gif");
+            $('#mainBandLogo').hide();
+        } else {
+            $('#mainBandLogo').attr("src", "/images/spacer.gif");
+        }
+        
+    }
+
+    function buildLogoMobile(data) {
+        var hasCustomBanner = myNavParams.hasCustomBanner;
+        var showBanner = myNavParams.showBanner;
+        var isCC = myNavParams.isCC;
+
+
+        if (hasCustomBanner) {
+            $('#mainBandLogo').addClass("custom_banner_logo");
+            $('#mainBandLogo').addClass("banner_logo");
+        }
+
+        if (showBanner ) {
+            if (hasCustomBanner ) {
+                $('#mainBandLogo').attr("src", "/images/spacer.gif");
+            } else {
+                $('#mainBandLogo').attr("src", data.ProductHeaderInfo.ImageUrl);
+                $('#mainBandLogo').attr("alt", data.ProductHeaderInfo.Name);
+            }
+        }
+        else if (currentMaster === 'playermaster' && (isCC)) {
+            $('#mainBandLogo').attr("src", "/images/spacer.gif");
+            $('#mainBandLogo').hide();
+        } else {
+            $('#mainBandLogo').attr("src", "/images/spacer.gif");
+        }
+
+    }
+    function buildTopNav(data) {
+        var out = "";
+        var hasCustomBanner = myNavParams.hasCustomBanner;
+        var showBanner = myNavParams.showBanner;
+        var pageLinkMode = myNavParams.pageLinkMode;
+        var username = myNavParams.userName;
+        var truncated_username = username;
+        var username_tooltip = "";
+        var datetooltip = myNavParams.currentLocaleFormat;
+
+        //Truncate longer usernames
+        if (username.length > 30) {
+            truncated_username = myNavParams.userName.substring(0, 30) + "...";
+            username_tooltip = username;
+        }
+        //XL-25716: if we didn't get PII from IES - this is used for screen reader purpose.
+        username_tooltip += myNavParams.NoNameScreenReaderText;
+
+        $.each(data.TopNavigation, function (index, item) {
+            out = out + '<div';
+            if (item.SubMenuData != null && item.SubMenuData.length > 0) {
+                out = out + ' class="dropdown"';
+            }
+            if (item.IsSeparator) {
+                if (showBanner || pageLinkMode === 'Frame') {
+                    if (hasCustomBanner)
+                        out = out + ' class="divider-vertical"';
+                    else
+                        out = out + ' class="nav-divider"';
+                }
+            }
+            out = out + '>';
+            if (item.SubMenuData != null) {
+                if (item.SubMenuData.length > 0) {
+                    
+                   //added data-role = none for anchor links to avoid the jquery mobile style
+                        // MyAccount key : 49
+                        if (item.Key === 49) {
+                            out = out + '<a href="#" data-role="none" class="dropdown-toggle my_account_name" data-toggle="dropdown" title="' + username_tooltip + '" aria-expanded="false">' + truncated_username + '<b class="caret"></b></a>';
+                        } else {
+                            out = out + '<a href="#" data-role="none" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' + item.Name + ' <b class="caret"></b></a>';
+                        }
+                    
+                    out = out + '<ul class="dropdown-menu">';
+                    $.each(item.SubMenuData, function(innerIndex, subitem) {
+                        if (subitem.IsSeparator) {
+                            out = out + '<li class="divider"></li>';
+                        } else {
+                            out = out + '<li>';
+                            out = out + '<a data-role="none" class="navA" href="' + subitem.Url + '"';
+                            if (subitem.Tooltip != null) {
+                                out = out + ' title="' + subitem.Tooltip + '"';
+                            }
+                            out = out + '>' + subitem.Name + '</a>';
+                            out = out + '</li>';
+                        }
+
+                    });
+                    out = out + '</ul>';
+                } else {
+                    // MyAccount key : 49
+                    if (item.Key === 49) 
+                        out = out + '<span class="my_account_name">' + username + ' </span>';
+                    else
+                        out = out + '<a data-role="none" href="#" >' + item.Name + ' </a>';
+                }
+            }
+            if (item.Url != null && item.SubMenuData == null) {
+                out = out + '<a data-role="none" href="' + item.Url + '"';
+                if (item.Tooltip != null) out = out + ' title="' + item.Tooltip + '"';
+                out = out + '>' + item.Name + '</a>';
+            }
+            if (item.Url == null && item.Name != null && (showBanner || pageLinkMode === 'Frame')) {
+                out = out + '<span id="toptime" class="navbar-text navbar-text-time" title="' + datetooltip + '">' + formatCourseDate(item.Name) + '</span>';
+            }
+            out = out + '</div>';
+        });
+        $('#mainTopNav').html(out);
+    }
+
+    function buildMobileTopNav(data) {
+        var out = "";
+        var hasCustomBanner = myNavParams.hasCustomBanner;
+        var showBanner = myNavParams.showBanner;
+        var pageLinkMode = myNavParams.pageLinkMode;
+        var username = myNavParams.userName;
+        var truncated_username = username;
+        var username_tooltip = "";
+        var datetooltip = myNavParams.currentLocaleFormat;
+
+        //Truncate longer usernames
+        if (username.length > 30) {
+            truncated_username = myNavParams.userName.substring(0, 30) + "...";
+            username_tooltip = username;
+        }
+
+        //XL-25716: if we didn't get PII from IES - this is used for screen reader purpose.
+        username_tooltip += myNavParams.NoNameScreenReaderText;
+
+        $.each(data.TopNavigation, function (index, item) {
+            out = out + '<div id="NavigationLinkKey_' + item.Key + '"';
+            if (item.SubMenuData != null && item.SubMenuData.length > 0) {
+                out = out + ' class="dropdown"';
+            }
+            if (item.IsSeparator) {
+                if (showBanner || pageLinkMode === 'Frame') {
+                    if (hasCustomBanner)
+                        out = out + ' class="divider"';
+                    else
+                        out = out + ' class="divider"';
+                }
+            }
+            out = out + '>';
+            if (item.SubMenuData != null) {
+                if (item.SubMenuData.length > 0) {
+
+                    //added data-role = none for anchor links to avoid the jquery mobile style
+                    // MyAccount key : 49
+                    if (item.Key === 49) {
+                        out = out + '<a href="#" data-role="none" class="dropdown-toggle my_account_name" data-toggle="dropdown" title="' + username_tooltip + '" aria-expanded="false">' + truncated_username + '<i class="fa fa-user" aria-hidden="true"></i></a>';
+                    }
+                    else if (item.Key === 43) {
+                        //help key : 43
+                        if (showBanner)
+                            out = out + '<a href="#" data-role="none" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-question-circle" area-hidden="true"></i><span class="sr-only">' + item.Name + '</span></a>';
+                    }
+                    else {
+                        out = out + '<a href="#" data-role="none" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' + item.Name + ' <i aria-hidden="true" class="fa fa-user"></b></a>';
+                    }
+
+                    if ((item.Key === 43 && showBanner) || item.Key !== 43) {
+                       
+                            out = out + '<ul class="dropdown-menu">';
+                            $.each(item.SubMenuData, function (innerIndex, subitem) {
+                                if (subitem.IsSeparator) {
+                                    out = out + '<li class="divider"></li>';
+                                } else {
+                                    out = out + '<li>';
+                                    out = out + '<a data-role="none" class="navA" href="' + subitem.Url + '"';
+                                    if (subitem.Tooltip != null)
+                                        out = out + ' title="' + subitem.Tooltip + '"';
+                                    out = out + '>' + subitem.Name + '</a>';
+                                    out = out + '</li>';
+                                }
+
+                            });
+                            out = out + '</ul>';
+                       
+                        
+                       
+                    }
+                    
+                } else {
+                    // MyAccount key : 49
+                    if (item.Key === 49)
+                        out = out + '<span class="navbar-text">' + username + ' <i class="fa fa-user" aria-hidden="true"></i></span>';
+                    else
+                        out = out + '<a data-role="none" href="#" >' + item.Name + ' </a>';
+                }
+            }
+            if (item.Url != null && item.SubMenuData == null) {
+                out = out + '<a data-role="none" href="' + item.Url + '"';
+                if (item.Tooltip != null)
+                  out = out + ' title="' + item.Tooltip + '"';
+                out = out + '>' + item.Name + '</a>';
+            }
+            if (item.Url == null && item.Name != null && (showBanner || pageLinkMode === 'Frame')) {
+                out = out + '<span id="toptime" class="navbar-text navbar-text-time" title="' + datetooltip + '">' + formatCourseDate(item.Name) + '</span>';
+            }
+            if (item.Url == null && item.Name == null)
+                out += "|";
+            out = out + '</div>';
+        });
+        $('#mainTopNav').html(out);
+    }
+    
+    function formatCourseDate(n) {
+        var e = myNavParams.IsSelfStudy, t, i, r, u, f;
+        return (e ? window.initialjsclockServerDateTime = (new Date).toString() : window.initialjsclockServerDateTime === "" && (window.initialjsclockServerDateTime = n), i = Date.parse(window.initialjsclockServerDateTime), r = new Date, t = r.valueOf() - i, u = new Date, f = new Date(u.valueOf() - t), typeof formatLocalDate == "function") ? formatLocalDate(f, LocClockPattern) : n
+    }
+
+    $.fn.exists = function () {
+        return this.length > 0;
+    }
+    $(function () { currentMaster === "default" ? defaultMaster() : currentMaster === "topnav" ? topNavMaster() : playerMaster(), flagNavInitialization = !1 });
+
+
